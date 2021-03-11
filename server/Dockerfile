@@ -19,4 +19,4 @@ RUN useradd -m myappusar
 USER myappusar
 
 #Heroku- necessário chamar com CMD não com ENTRYPOINT
-CMD ASPNETCORE_URLS=http://*:$PORT dotnet TelegramBotReminder.dll
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet Telegram.WebAPI.dll

@@ -4,12 +4,15 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using server.GeneralFunctions;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.WebAPI.Data;
+using Telegram.WebAPI.Hubs;
+using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Models;
 
 namespace Telegram.WebAPI.services
@@ -22,9 +25,11 @@ namespace Telegram.WebAPI.services
         private static string lastRiverLevel;
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
-        public TelegramBotService(IRepository repo)
+        private readonly IHubContext<ChatHub, IChatClient> _chatHub;
+        public TelegramBotService(IRepository repo, IHubContext<ChatHub, IChatClient> chatHub)
         {
             _repo = repo;
+            _chatHub = chatHub;
             bot = new TelegramBotClient(_token);
             bot.OnMessage += botMessageReceiver;
             bot.StartReceiving();
@@ -48,6 +53,8 @@ namespace Telegram.WebAPI.services
             {
                 //Delay de 50 segundos
                 sendMessagesIfNeeded();
+                await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage("teste", "checando mensagens", DateTime.Now));
+
                 await Task.Delay(30000, stoppingToken);
             }
             while (!stoppingToken.IsCancellationRequested);
@@ -69,6 +76,7 @@ namespace Telegram.WebAPI.services
         private async void PrepareQuestionnaires(MessageEventArgs e)
         {
             int chatId = (int)e.Message.Chat.Id;
+            await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage(chatId.ToString(), e.Message.Text, e.Message.Date));
             //string jsonString = JsonSerializer.Serialize(e);
             //Functions.LogEvent($"MessageEvent: {jsonString}");
             //Functions.LogEvent($"Mensagem recebida {e.Message.Text} - do chat {chatId}");
@@ -243,13 +251,7 @@ namespace Telegram.WebAPI.services
                 if (replyMarkup == null)
                     replyMarkup = new ReplyKeyboardRemove() { };
 
-                //var responseString = client.GetStringAsync($"https://api.telegram.org/bot{_token}/sendMessage?chat_id={chatClient.ChatId}&text={chatClient.TextMessage}");
-                //Functions.LogEvent(responseString.Result.ToString());
                 var messageSent = await bot.SendTextMessageAsync(chatId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
-                // _context.Add(new Mensagem { ClienteId = _context.GetClienteId(chatId), TextMessage = text, MessageDate = DateTime.Now, MessageSent = true });
-                // _context.SaveChanges();
-                // string jsonString = JsonSerializer.Serialize(messageSent);
-                // Functions.LogEvent($"messageSent: {jsonString}");
                 return true;
             }
             catch (Exception e)

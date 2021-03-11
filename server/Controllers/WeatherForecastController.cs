@@ -12,11 +12,6 @@ namespace Telegram.WebAPI.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private readonly IRepository _repo;
-        public WeatherForecastController(IRepository repo)
-        {
-            _repo = repo;
-        }
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"

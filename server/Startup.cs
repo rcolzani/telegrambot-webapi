@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.WebAPI.Data;
+using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.services;
 
 namespace Telegram.WebAPI
@@ -29,7 +30,7 @@ namespace Telegram.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TelegramContext>(
-                           context => context.UseMySql(Configuration.GetConnectionString("MySqlConnection")), ServiceLifetime.Singleton
+                           context => context.UseMySql(Configuration.GetConnectionString("JawsDB")), ServiceLifetime.Singleton
                        );
 
 
@@ -38,11 +39,24 @@ namespace Telegram.WebAPI
              );
             services.AddControllers();
 
+            services.AddSignalR();
+
             services.AddSingleton<IRepository, Repository>();
 
             services.AddSingleton<IConfiguration>(Configuration);
 
             services.AddHostedService<TelegramBotService>();
+
+            services.AddCors(options =>
+           {
+               options.AddPolicy("ClientPermission", policy =>
+               {
+                   policy.AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .WithOrigins("http://localhost:5000")
+                       .AllowCredentials();
+               });
+           });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +67,9 @@ namespace Telegram.WebAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
+
+            app.UseCors("ClientPermission");
 
             app.UseRouting();
 
@@ -62,6 +78,7 @@ namespace Telegram.WebAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/hubs/chat");
             });
         }
     }
