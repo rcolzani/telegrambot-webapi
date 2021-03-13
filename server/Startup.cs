@@ -33,7 +33,7 @@ namespace Telegram.WebAPI
                            context => context.UseMySql(Configuration.GetConnectionString("JawsDB")), ServiceLifetime.Singleton
                        );
 
-
+            Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
             services.AddControllers().AddNewtonsoftJson(options =>
              options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
              );

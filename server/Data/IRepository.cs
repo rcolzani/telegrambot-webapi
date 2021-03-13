@@ -11,8 +11,8 @@ namespace Telegram.WebAPI.Data
         void Remove<T>(T entity) where T : class;
         bool SaveChanges();
 
-        Task<Cliente> GetClienteAsync(int id);
-        Task<Cliente> GetClienteByTelegramIdAsync(long id);
+        Task<Cliente> GetClienteAsync(int id, bool asNoTracking = false);
+        Task<Cliente> GetClienteByTelegramIdAsync(long id, bool asNoTracking = false);
         Task<Cliente[]> GetAllClientesAsync();
         Task<Mensagem[]> GetAllMessagesByClienteAsync(int clienteId);
 

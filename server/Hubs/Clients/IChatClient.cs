@@ -7,5 +7,6 @@ namespace Telegram.WebAPI.Hubs.Clients
     public interface IChatClient
     {
         Task ReceiveMessage(ChatMessage message);
+        Task StatistcsUpdate(StatisticsMain statistics);
     }
 }

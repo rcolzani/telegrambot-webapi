@@ -9,7 +9,6 @@ namespace server.Hubs.Models
             this.User = user;
             this.Message = message;
             this.DataHora = dataHora;
-
         }
         public string User { get; set; }
 

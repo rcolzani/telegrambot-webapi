@@ -2,9 +2,9 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace server.GeneralFunctions
+namespace Functions
 {
-    static class Functions
+    static class Generic
     {
         public static void LogEvent(string LcTexto)
         {

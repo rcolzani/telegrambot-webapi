@@ -32,17 +32,21 @@ namespace Telegram.WebAPI.Data
             return (_context.SaveChanges() > 0);
         }
 
-        public async Task<Cliente> GetClienteAsync(int id)
+        public async Task<Cliente> GetClienteAsync(int id, bool asNoTracking)
         {
             IQueryable<Cliente> query = _context.Clientes;
 
             query = query.Where(u => u.Id == id);
             return await query.FirstOrDefaultAsync();
         }
-        public async Task<Cliente> GetClienteByTelegramIdAsync(long telegramId)
+        public async Task<Cliente> GetClienteByTelegramIdAsync(long telegramId, bool asNoTracking)
         {
             IQueryable<Cliente> query = _context.Clientes;
             query = query.Where(u => u.TelegramChatId == telegramId);
+
+            if (asNoTracking)
+                query.AsNoTracking();
+
             return await query.FirstOrDefaultAsync();
         }
         public async Task<Cliente[]> GetAllClientesAsync()

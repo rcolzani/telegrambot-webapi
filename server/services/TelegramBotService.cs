@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
-using server.GeneralFunctions;
+using Functions;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -20,19 +20,20 @@ namespace Telegram.WebAPI.services
     public class TelegramBotService : IHostedService
     {
         private readonly IRepository _repo;
-        private readonly string _token = "1580927578:AAHMaEQ44RwBI2LdFihYr6Joe_Y84bMVwbA";
-        private static TelegramBotClient bot;
-        private static string lastRiverLevel;
+        private readonly string _token = Functions.Settings.TelegramToken;
+        private TelegramBotClient bot;
+        private string lastRiverLevel;
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
+        private bool telegramBotRunning = false;
         public TelegramBotService(IRepository repo, IHubContext<ChatHub, IChatClient> chatHub)
         {
             _repo = repo;
             _chatHub = chatHub;
             bot = new TelegramBotClient(_token);
             bot.OnMessage += botMessageReceiver;
-            bot.StartReceiving();
+            Settings.TelegramBotActivated = true;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -51,10 +52,19 @@ namespace Telegram.WebAPI.services
             //Esta Task é apenas para o service ficar rodando como HostedService
             do
             {
-                //Delay de 50 segundos
-                sendMessagesIfNeeded();
-                await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage("teste", "checando mensagens", DateTime.Now));
+                if (telegramBotRunning && Settings.TelegramBotActivated == false)
+                {
+                    stopReceiving();
+                }
+                else if (telegramBotRunning == false && Settings.TelegramBotActivated)
+                {
+                    startReceiving();
+                }
 
+                if (telegramBotRunning)
+                    sendMessagesIfNeeded();
+
+                await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage("teste", "checando mensagens", DateTime.Now));
                 await Task.Delay(30000, stoppingToken);
             }
             while (!stoppingToken.IsCancellationRequested);
@@ -69,9 +79,15 @@ namespace Telegram.WebAPI.services
             if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text)
                 PrepareQuestionnaires(e);
         }
+        private void startReceiving()
+        {
+            bot.StartReceiving();
+            telegramBotRunning = true;
+        }
         private void stopReceiving()
         {
             bot.StopReceiving();
+            telegramBotRunning = false;
         }
         private async void PrepareQuestionnaires(MessageEventArgs e)
         {
@@ -93,7 +109,7 @@ namespace Telegram.WebAPI.services
 
             _repo.Add(new Mensagem(clientChat.Id, e.Message.Text, e.Message.Date, false));
             _repo.SaveChanges();
-            string messageReceived = Functions.RemoveAccents(e.Message.Text.ToLower());
+            string messageReceived = Functions.Generic.RemoveAccents(e.Message.Text.ToLower());
             if (messageReceived == "ola" || messageReceived == "/start")
             {
 
@@ -241,7 +257,16 @@ namespace Telegram.WebAPI.services
             _repo.Update(clientChat);
             _repo.SaveChanges();
         }
-        private async static Task<bool> sendMessageAsync(long chatId, string text, IReplyMarkup replyMarkup = null)
+        private async Task<bool> sendMessageAsync(int clientId, string text, IReplyMarkup replyMarkup = null)
+        {
+            var client = await _repo.GetClienteAsync(clientId, true);
+            if (client == null)
+            {
+                return false;
+            }
+            return await sendMessageAsync(client.TelegramChatId, text, replyMarkup);
+        }
+        private async Task<bool> sendMessageAsync(long telegramClientId, string text, IReplyMarkup replyMarkup = null)
         {
             try
             {
@@ -251,7 +276,8 @@ namespace Telegram.WebAPI.services
                 if (replyMarkup == null)
                     replyMarkup = new ReplyKeyboardRemove() { };
 
-                var messageSent = await bot.SendTextMessageAsync(chatId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
+                var messageSent = await bot.SendTextMessageAsync(telegramClientId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
+                await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage(telegramClientId.ToString(), text, DateTime.Now));
                 return true;
             }
             catch (Exception e)
@@ -342,5 +368,10 @@ namespace Telegram.WebAPI.services
             waitingForTime = 2,
             complete = 3
         }
+    }
+
+    public class TelegramFunctions
+    {
+
     }
 }
