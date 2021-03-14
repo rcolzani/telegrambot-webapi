@@ -54,6 +54,9 @@ namespace Telegram.WebAPI
                    policy.AllowAnyHeader()
                        .AllowAnyMethod()
                        .WithOrigins("http://localhost:5000")
+                       .WithOrigins("https://localhost:5001")
+                       .WithOrigins("http://telegram.rcolzani.com")
+                       .WithOrigins("https://focused-borg-5cc3c6.netlify.app")
                        .AllowCredentials();
                });
            });

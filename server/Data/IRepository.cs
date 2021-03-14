@@ -15,6 +15,7 @@ namespace Telegram.WebAPI.Data
         Task<Cliente> GetClienteByTelegramIdAsync(long id, bool asNoTracking = false);
         Task<Cliente[]> GetAllClientesAsync();
         Task<Mensagem[]> GetAllMessagesByClienteAsync(int clienteId);
+        Task<Mensagem[]> GetAllMessagesAsync();
 
     }
 }

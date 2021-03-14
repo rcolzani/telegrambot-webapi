@@ -65,5 +65,13 @@ namespace Telegram.WebAPI.Data
 
             return await query.ToArrayAsync();
         }
+        public async Task<Mensagem[]> GetAllMessagesAsync()
+        {
+            IQueryable<Mensagem> query = _context.Mensagens;
+            query = query.AsNoTracking()
+                         .OrderBy(a => a.MessageDate);
+
+            return await query.ToArrayAsync();
+        }
     }
 }

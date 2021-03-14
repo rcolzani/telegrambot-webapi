@@ -11,17 +11,15 @@ const Chat = () => {
     latestChat.current = chat;
 
     useEffect(() => {
-        const urlServer = 'https://bottelegramrcolzani.herokuapp.com';
-        //const urlServer = 'http://localhost:5000';
         const connection = new HubConnectionBuilder()
-            .withUrl(`${urlServer}/hubs/chat`, {
+            .withUrl(`${process.env.REACT_APP_SERVER_URL}/hubs/chat`, {
                 skipNegotiation: true,
                 transport: HttpTransportType.WebSockets
             })
             .withAutomaticReconnect()
             .build();
 
-        console.log(`Passou: ${urlServer}/hubs/chat`);
+        console.log(`Passou: ${connection.baseUrl}`);
         connection.start()
             .then(result => {
                 console.log('Connected!');

@@ -55,16 +55,20 @@ namespace Telegram.WebAPI.services
                 if (telegramBotRunning && Settings.TelegramBotActivated == false)
                 {
                     stopReceiving();
+                    await _chatHub.Clients.All.ReceiveMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi parado.", DateTime.Now));
                 }
                 else if (telegramBotRunning == false && Settings.TelegramBotActivated)
                 {
                     startReceiving();
+                    await _chatHub.Clients.All.ReceiveMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi iniciado.", DateTime.Now));
                 }
 
                 if (telegramBotRunning)
+                {
                     sendMessagesIfNeeded();
+                    await _chatHub.Clients.All.ReceiveMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("teste", "checando mensagens", DateTime.Now));
+                }
 
-                await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage("teste", "checando mensagens", DateTime.Now));
                 await Task.Delay(30000, stoppingToken);
             }
             while (!stoppingToken.IsCancellationRequested);
@@ -92,7 +96,7 @@ namespace Telegram.WebAPI.services
         private async void PrepareQuestionnaires(MessageEventArgs e)
         {
             int chatId = (int)e.Message.Chat.Id;
-            await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage(chatId.ToString(), e.Message.Text, e.Message.Date));
+            await _chatHub.Clients.All.ReceiveMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage(chatId.ToString(), e.Message.Text, e.Message.Date));
             //string jsonString = JsonSerializer.Serialize(e);
             //Functions.LogEvent($"MessageEvent: {jsonString}");
             //Functions.LogEvent($"Mensagem recebida {e.Message.Text} - do chat {chatId}");
@@ -277,7 +281,7 @@ namespace Telegram.WebAPI.services
                     replyMarkup = new ReplyKeyboardRemove() { };
 
                 var messageSent = await bot.SendTextMessageAsync(telegramClientId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
-                await _chatHub.Clients.All.ReceiveMessage(new server.Hubs.Models.ChatMessage(telegramClientId.ToString(), text, DateTime.Now));
+                await _chatHub.Clients.All.ReceiveMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage(telegramClientId.ToString(), text, DateTime.Now));
                 return true;
             }
             catch (Exception e)

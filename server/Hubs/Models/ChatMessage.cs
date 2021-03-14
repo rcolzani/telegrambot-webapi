@@ -1,6 +1,6 @@
 using System;
 
-namespace server.Hubs.Models
+namespace Telegram.WebAPI.Hubs.Models
 {
     public class ChatMessage
     {

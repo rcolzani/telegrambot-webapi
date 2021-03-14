@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using server.Hubs.Models;
+using Telegram.WebAPI.Hubs.Models;
 
 namespace Telegram.WebAPI.Hubs.Clients
 {
