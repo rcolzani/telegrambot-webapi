@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bar } from 'react-chartjs-2';
+// import { Bar } from 'react-chartjs-2';
 import { Container, Title } from './styles';
 
 
@@ -21,12 +21,12 @@ const Dashboard = () => {
     return (
         <Container>
             <Title>Dashboard</Title>
-            <Bar
+            {/* <Bar
                 data={data}
                 width={'100%'}
                 height={'100%'}
                 options={{ maintainAspectRatio: false }}
-            />
+            /> */}
         </Container>
     );
 };
