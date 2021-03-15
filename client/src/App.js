@@ -1,5 +1,5 @@
 import React from 'react';
-import Timezones from './timezones/Timezones';
+// import Timezones from './timezones/Timezones';
 import Chat from './Chat/Chat';
 import Dashboard from './Dashboard'
 
