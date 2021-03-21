@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Message from './Message';
+import { Container } from './styles'
 
 const ChatWindow = (props) => {
     const chat = props.chat
@@ -10,9 +11,9 @@ const ChatWindow = (props) => {
             message={m.message}
             dataHora={m.dataHora} />);
     return (
-        <div>
+        <Container>
             {chat.length <= 0 ? <span>Aguardando mensagens...</span> : chat}
-        </div>
+        </Container>
     )
 };
 

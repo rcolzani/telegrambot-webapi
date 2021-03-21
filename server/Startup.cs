@@ -30,8 +30,7 @@ namespace Telegram.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TelegramContext>(
-                           context => context.UseMySql(Configuration.GetConnectionString("JawsDB")), ServiceLifetime.Singleton
-                       );
+                           context => context.UseMySql(Configuration.GetConnectionString("JawsDB")), ServiceLifetime.Singleton);
 
             Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
             services.AddControllers().AddNewtonsoftJson(options =>
@@ -53,10 +52,11 @@ namespace Telegram.WebAPI
                {
                    policy.AllowAnyHeader()
                        .AllowAnyMethod()
-                       .WithOrigins("http://localhost:5000")
-                       .WithOrigins("https://localhost:5001")
-                       .WithOrigins("http://telegram.rcolzani.com")
-                       .WithOrigins("https://focused-borg-5cc3c6.netlify.app")
+                       .WithOrigins(new string[] {
+                           "http://localhost:3000",
+                       "https://localhost:3000",
+                       "http://telegram.rcolzani.com",
+                       "https://focused-borg-5cc3c6.netlify.app"})
                        .AllowCredentials();
                });
            });

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.WebAPI.Data;
+using Telegram.WebAPI.Dtos;
 
 namespace Telegram.WebAPI.Controllers
 {
@@ -21,15 +22,10 @@ namespace Telegram.WebAPI.Controllers
             return Ok(Functions.Settings.TelegramBotActivated);
         }
 
-        [HttpPost("{activate}")]
-        public IActionResult Post(bool activate)
+        [HttpPost]
+        public IActionResult Post(StatusChangeDto statusChange)
         {
-            // string responseText = "";
-            // if ((activate && Functions.Settings.TelegramBotActivated) || (activate == false && Functions.Settings.TelegramBotActivated == false))
-            // {
-            //     responseText = "Already with this status";
-            // }
-            Functions.Settings.TelegramBotActivated = activate;
+            Functions.Settings.TelegramBotActivated = statusChange.Activate;
             return Ok(Functions.Settings.TelegramBotActivated);
         }
 

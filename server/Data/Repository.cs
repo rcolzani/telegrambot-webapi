@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,13 +32,33 @@ namespace Telegram.WebAPI.Data
         {
             return (_context.SaveChanges() > 0);
         }
+        public Cliente AddClient(int chatId, out bool isNewClient)
+        {
+            isNewClient = false;
+            var clientChat = GetClienteByTelegramId(chatId, true);
 
+            if (clientChat == null)
+            {
+                Add(new Cliente(chatId, "", (int)services.TelegramBotService.clientStatus.newCliente, new TimeSpan(08, 00, 00), DateTime.Now.AddDays(-1), false, false, DateTime.Now));
+                SaveChanges();
+                clientChat = GetClienteByTelegramId(chatId, true);
+                isNewClient = true;
+            }
+            return clientChat;
+        }
         public async Task<Cliente> GetClienteAsync(int id, bool asNoTracking)
         {
             IQueryable<Cliente> query = _context.Clientes;
 
             query = query.Where(u => u.Id == id);
             return await query.FirstOrDefaultAsync();
+        }
+        public Cliente GetCliente(int id, bool asNoTracking)
+        {
+            IQueryable<Cliente> query = _context.Clientes;
+
+            query = query.Where(u => u.Id == id);
+            return query.FirstOrDefault();
         }
         public async Task<Cliente> GetClienteByTelegramIdAsync(long telegramId, bool asNoTracking)
         {
@@ -49,11 +70,27 @@ namespace Telegram.WebAPI.Data
 
             return await query.FirstOrDefaultAsync();
         }
+        public Cliente GetClienteByTelegramId(long telegramId, bool asNoTracking)
+        {
+            IQueryable<Cliente> query = _context.Clientes;
+            query = query.Where(u => u.TelegramChatId == telegramId);
+
+            if (asNoTracking)
+                query.AsNoTracking();
+
+            return query.FirstOrDefault();
+        }
         public async Task<Cliente[]> GetAllClientesAsync()
         {
             IQueryable<Cliente> query = _context.Clientes;
             query = query.OrderBy(a => a.Id);
             return await query.ToArrayAsync();
+        }
+        public Cliente[] GetAllClientes()
+        {
+            IQueryable<Cliente> query = _context.Clientes;
+            query = query.OrderBy(a => a.Id);
+            return query.ToArray();
         }
 
         public async Task<Mensagem[]> GetAllMessagesByClienteAsync(int clienteId)

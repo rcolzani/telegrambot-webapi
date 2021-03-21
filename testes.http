@@ -2,15 +2,17 @@ POST  HTTP/1.1
 header name: header value
 ###
 
-POST http://localhost:5000/telegrambot/true HTTP/1.1
+POST http://localhost:5000/telegrambot/ HTTP/1.1
 content-type: application/json
 
 {
+    "activate": true
 }
 ###
 
-POST https://bottelegramrcolzani.herokuapp.com/telegrambot/true HTTP/1.1
+POST https://bottelegramrcolzani.herokuapp.com/telegrambot/false HTTP/1.1
 content-type: application/json
 
 {
+    "activate": true
 }

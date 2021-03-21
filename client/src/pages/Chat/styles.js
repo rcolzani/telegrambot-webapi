@@ -12,9 +12,13 @@ export const ServerStatus = styled.span`
 `
 export const Messages = styled.div`
 padding: 0 10px;
+
+ small{
+        margin-top: 50px;
+        align-self: flex-end;
+    }
 `
 
 export const Title = styled.h1`
-    
     margin-top: 50px;
 `

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr';
 
-import ChatWindow from './ChatWindow/ChatWindow';
+import ChatWindow from './ChatWindow';
 import { Title, Container, ServerStatus, Messages } from './styles';
 
 const Chat = () => {
@@ -54,6 +54,7 @@ const Chat = () => {
             <Messages>
                 <Title>Mensagens enviadas e recebidas</Title>
                 <ChatWindow chat={chat} />
+                <small>Os nomes dos usuários são limitados a 2 caracteres para privacidade</small>
             </Messages>
         </Container>
     );

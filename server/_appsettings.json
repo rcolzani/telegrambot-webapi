@@ -1,5 +1,5 @@
 {
-  "TelegramBotToken": "1580927578:AAHMaEQ44RwBI2LdFihYr6Joe_Y84bMVwbA",
+  "TelegramBotToken": "YourTelegramBotToken",
   "ConnectionStrings": {
     "MySqlConnection": "Server=192.168.99.101;Port=3306;Database=TelegramBot;User=root;Password=ZZZ",
     "JawsDB": "Server=ZZZ;Port=3306;Database=ZZZ;User=ZZZ;Password=ZZZ"
