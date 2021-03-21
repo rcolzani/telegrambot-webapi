@@ -1,16 +1,15 @@
 import React from 'react';
-// import Timezones from './timezones/Timezones';
-import Chat from './Chat/Chat';
-import Dashboard from './Dashboard'
+import Chat from './pages/Chat';
+import Dashboard from './pages/Dashboard'
+import GlobalStyle from './styles/global'
 
 function App() {
   return (
-    <div style={{ margin: '0 30%' }}>
-      <Dashboard />
+    <>
+      {/* <Dashboard /> */}
       <Chat />
-      {/* <Timezones /> */}
-
-    </div>
+      <GlobalStyle />
+    </>
   );
 }
 

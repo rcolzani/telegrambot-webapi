@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Message from './Message/Message';
+import Message from './Message';
 
 const ChatWindow = (props) => {
     const chat = props.chat
@@ -8,10 +8,10 @@ const ChatWindow = (props) => {
             key={Date.now() * Math.random()}
             user={m.user}
             message={m.message}
-            datahora={m.datahora} />);
+            dataHora={m.dataHora} />);
     return (
         <div>
-            {chat}
+            {chat.length <= 0 ? <span>Aguardando mensagens...</span> : chat}
         </div>
     )
 };
