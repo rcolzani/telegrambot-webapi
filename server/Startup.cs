@@ -55,7 +55,7 @@ namespace Telegram.WebAPI
                        .WithOrigins(new string[] {
                            "http://localhost:3000",
                        "https://localhost:3000",
-                       "http://telegram.rcolzani.com",
+                       "https://telbot.rcolzani.com",
                        "https://focused-borg-5cc3c6.netlify.app"})
                        .AllowCredentials();
                });
