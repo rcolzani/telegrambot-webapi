@@ -25,15 +25,29 @@
 
 Este projeto desenvolvido através de um bot no Telegram tem duas funcionalidades principais:
 
-##### 1 - ⏰ Criar lembrete
-
-Crie um lembrete e seja avisado através do telegram todos os dias no horário cadastrado. Você pode, por exemplo, criar um lembrete para beber água, se medicar, tirar o lixo, se exercitar...
-
-##### 1 - 💦 Receber a medição do nível do rio de Blumenau/SC.
+#### 1 - 💦 Receber a medição do nível do rio de Blumenau/SC.
 
 A cidade de Blumenau sofre com enchentes e enxurradas ocasionalmente. Como alguns pontos da cidade podem ficar alagados ou ilhados, nesses momentos é comum as pessoas acessarem o site do <a href="http://alertablu.cob.sc.gov.br/d/nivel-do-rio">AlertaBlu</a> para estarem atualizadas da medição do nível do rio.
 
 Com este projeto os usuários podem receber alertas atualizados com o nível atual do rio através do Telegram. Os dados são obtidos diretamente no site do <a href="http://alertablu.cob.sc.gov.br/d/nivel-do-rio"> AlertaBlu/Defesa Civil</a> e enviados a partir de um bot no Telegram.
+
+<sub>Cadastro para receber a medição do nível do rio</sub>
+![Cadastro de lembretes no Telegram](/screenshots/TelegramNivelDoRio.jpeg?raw=true "Cadastro para receber a medição do nível do rio")
+
+#### 2 - ⏰ Criar lembrete
+
+Crie um lembrete e seja avisado através do telegram todos os dias no horário cadastrado. Você pode, por exemplo, criar um lembrete para beber água, se medicar, tirar o lixo, se exercitar...
+
+<sub>Exemplo de cadastro no Telegram</sub>
+![Cadastro de lembretes no Telegram](/screenshots/TelegramCadastroLembrete.jpeg?raw=true "Cadastro de lembretes no Telegram")
+
+##### Outros screenshots das telas
+
+<sub>Teclado com botões personalizados</sub>
+![Teclado com botões configuráveis](/screenshots/TelegramReplyKeyboard.jpeg?raw=true "Teclado com botões configuráveis")
+
+<sub>Frontend em ReactJS para monitoramento das mensagens. É atualizado a partir do servidor através do SignalR.</sub>
+![Frontend em ReactJS](/screenshots/FrontendMonitoramentoMensagens.png?raw=true "Frontend em ReactJS")
 
 ##### Como utilizar
 

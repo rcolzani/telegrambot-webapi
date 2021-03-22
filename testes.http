@@ -10,7 +10,7 @@ content-type: application/json
 }
 ###
 
-POST https://bottelegramrcolzani.herokuapp.com/telegrambot/false HTTP/1.1
+POST https://bottelegramrcolzani.herokuapp.com/telegrambot HTTP/1.1
 content-type: application/json
 
 {

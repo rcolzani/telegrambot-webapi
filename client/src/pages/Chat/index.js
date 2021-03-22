@@ -12,6 +12,7 @@ const Chat = () => {
     latestChat.current = chat;
 
     useEffect(() => {
+        document.title = "TelegramBot - Mensagens"
         const connection = new HubConnectionBuilder()
             .withUrl(`${process.env.REACT_APP_SERVER_URL}/hubs/chat`)
             .withAutomaticReconnect()
