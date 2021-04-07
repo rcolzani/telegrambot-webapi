@@ -51,6 +51,7 @@ namespace Telegram.WebAPI.Controllers
             {
                 _logger.LogError(ex, "Erro:");
             }
+            return Problem("Falhou");
         }
 
     }
