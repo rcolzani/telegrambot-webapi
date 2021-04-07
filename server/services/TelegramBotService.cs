@@ -365,11 +365,16 @@ namespace Telegram.WebAPI.services
                 bool enviarNivel = false;
                 string riverLevelHour = "", riverLevel = "";
                 RiverLevelAlertaBlu(out riverLevel, out riverLevelHour);
-                if (lastRiverLevel != riverLevel + riverLevelHour)
+
+                if (string.IsNullOrEmpty(riverLevel) || string.IsNullOrEmpty(riverLevelHour))
+                {
+                    //As vezes acontece de o site da prefeitura estar com algum dado vazio e não pode ser enviado nesses casos
+                }
+                else if (lastRiverLevel != riverLevel + riverLevelHour)
                 {
                     enviarNivel = true;
+                    lastRiverLevel = riverLevel + riverLevelHour;
                 }
-                lastRiverLevel = riverLevel + riverLevelHour;
 
                 foreach (var client in _repo.GetAllClientes())
                 {
@@ -423,6 +428,12 @@ namespace Telegram.WebAPI.services
                 var document = new HtmlDocument();
                 document.LoadHtml(siteContent);
                 var nodes = document.DocumentNode.SelectNodes("//*[@id='river-level-table']/tbody/tr/td");
+
+                if (nodes.Count < 2)
+                {
+                    return;
+                }
+
                 riverLevelHour = nodes[0].InnerText.Trim();
                 riverLevel = nodes[1].InnerText.Trim();
             }
