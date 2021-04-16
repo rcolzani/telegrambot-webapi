@@ -10,7 +10,7 @@ namespace Telegram.WebAPI.Controllers
 {
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase
     {
         private readonly IRepository _repo;
@@ -33,7 +33,7 @@ namespace Telegram.WebAPI.Controllers
             return Ok(Functions.Settings.TelegramBotActivated);
         }
 
-        [HttpGet("getquantity")]
+        [HttpGet("quantity")]
         public async Task<IActionResult> GetQuantity(bool activate)
         {
             try

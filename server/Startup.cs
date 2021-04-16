@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using server.Middlewares;
 using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.services;
@@ -77,6 +78,8 @@ namespace Telegram.WebAPI
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<MiddlewareTeste>();
 
             app.UseEndpoints(endpoints =>
             {
