@@ -7,7 +7,9 @@ import { faCogs } from '@fortawesome/free-solid-svg-icons'
 const Message = (props) => {
 
     return (<Container>
-        <div><p><strong>{getFormattedDate(props.dataHora)} {props.user}:</strong></p><p>{props.message}</p></div>
+        <div><p>
+            <strong>{getFormattedDate(props.dataHora)} {props.user}:</strong>
+        </p><p>{props.message}</p></div>
         <span style={{ background: "#250" }}></span>
     </Container>
     )

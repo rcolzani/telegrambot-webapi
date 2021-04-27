@@ -33,9 +33,12 @@ const Chat = () => {
     }
 
     useEffect(() => {
-        document.title = "TelegramBot - Mensagens"
+        document.title = "TelegramBot - Mensagens";
+
+        const urlServer = process.env.NODE_ENV === 'development' ? process.env.REACT_APP_SERVER_URL_LOCAL : process.env.REACT_APP_SERVER_URL_HEROKU;
+
         const connection = new HubConnectionBuilder()
-            .withUrl(`${process.env.REACT_APP_SERVER_URL}/hubs/chat`)
+            .withUrl(`${urlServer}/hubs/chat`)
             .withAutomaticReconnect()
             .build();
 
