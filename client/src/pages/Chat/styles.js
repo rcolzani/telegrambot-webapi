@@ -10,6 +10,12 @@ export const Container = styled.div`
 export const ServerStatus = styled.span`
     align-self: flex-start;
 `
+export const ServerActions = styled.span`
+    align-self: flex-end;
+    padding-right: 15px;
+    a { color: #fefefe;}
+`
+
 export const Messages = styled.div`
 padding: 0 10px;
 
@@ -20,5 +26,5 @@ padding: 0 10px;
 `
 
 export const Title = styled.h1`
-    margin-top: 50px;
+    //margin-top: 50px;
 `

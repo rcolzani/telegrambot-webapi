@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr';
-
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ChatWindow from './ChatWindow';
-import { Title, Container, ServerStatus, Messages } from './styles';
+import Actions from '../Actions'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCogs } from '@fortawesome/free-solid-svg-icons'
+import { Title, Container, ServerStatus, ServerActions, Messages } from './styles';
 
 const Chat = () => {
     const [chat, setChat] = useState([]);
@@ -10,6 +14,23 @@ const Chat = () => {
     const latestChat = useRef(null);
 
     latestChat.current = chat;
+
+    const statusServerEnum = { "Ok": 1, "Falhou": 2, "Sucesso": 3 }
+
+    const updateServerStatus = (description, statusServer) => {
+        setServerStatus(description);
+        switch (statusServer) {
+            case statusServerEnum.Sucesso:
+                toast.success(description);
+                break;
+            case statusServerEnum.Falhou:
+                toast.error(description);
+                break;
+            default:
+                toast(description);
+                break;
+        }
+    }
 
     useEffect(() => {
         document.title = "TelegramBot - Mensagens"
@@ -27,24 +48,24 @@ const Chat = () => {
         //     .withAutomaticReconnect()
         //     .build();
 
-        setServerStatus("Iniciando conexão");
+        updateServerStatus("Iniciando conexão", statusServerEnum.Ok);
         connection.start()
             .then(result => {
-                setServerStatus("Conectado com sucesso")
+                updateServerStatus("Conectado com sucesso", statusServerEnum.Sucesso)
                 connection.on('ReceiveMessage', message => {
                     let updatedChat = [...latestChat.current];
                     console.log(latestChat.current.length);
-                    if (latestChat.current.length >= 10) {
-                        updatedChat = updatedChat.slice(1);
+                    if (latestChat.current.length >= 6) {
+                        updatedChat.pop();// = updatedChat.slice(5);
                     }
-                    updatedChat.push(message);
+                    updatedChat.unshift(message);
                     updatedChat.sort((a, b) => b.dataHora - a.dataHora);
                     console.log(message);
                     setChat(updatedChat);
                 });
             })
             .catch(e => {
-                setServerStatus("Conexão falhou com o servidor")
+                updateServerStatus("Conexão falhou com o servidor", statusServerEnum.Falhou)
                 console.log('Connection failed: ', e)
             });
     }, []);
@@ -52,6 +73,9 @@ const Chat = () => {
     return (
         <Container>
             <ServerStatus><span>Status: </span> {serverStatus}</ServerStatus>
+            <ServerActions>
+                <Link to="/actions"> <FontAwesomeIcon icon={faCogs} size="2x" /></Link>
+            </ServerActions>
             <Messages>
                 <Title>Mensagens enviadas e recebidas</Title>
                 <ChatWindow chat={chat} />
