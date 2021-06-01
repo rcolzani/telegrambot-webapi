@@ -12,15 +12,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
-using Telegram.WebAPI.Models;
 using Telegram.WebAPI.Hubs.Models;
 using Functions;
+using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Entities;
 
 namespace Telegram.WebAPI.services
 {
     public class TelegramBotService : IHostedService
     {
-        private readonly IRepository _repo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly string _token = Functions.Settings.TelegramToken;
         private TelegramBotClient bot;
         private string lastRiverLevel;
@@ -28,9 +29,9 @@ namespace Telegram.WebAPI.services
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
         private bool telegramBotRunning = false;
-        public TelegramBotService(IRepository repo, IHubContext<ChatHub, IChatClient> chatHub)
+        public TelegramBotService(IUnitOfWork unitOfWork, IHubContext<ChatHub, IChatClient> chatHub)
         {
-            _repo = repo;
+            _unitOfWork = unitOfWork;
             _chatHub = chatHub;
             bot = new TelegramBotClient(_token);
             bot.OnMessage += botMessageReceiver;
@@ -70,7 +71,7 @@ namespace Telegram.WebAPI.services
                     await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "checando mensagens", DateTime.Now), false);
                 }
 
-                await Task.Delay(30000, stoppingToken);
+                await Task.Delay(60000, stoppingToken);
             }
             while (!stoppingToken.IsCancellationRequested);
         }
@@ -109,11 +110,11 @@ namespace Telegram.WebAPI.services
             await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage(e.Message.Chat.FirstName, e.Message.Text, e.Message.Date), true);
 
             bool isNewCliente = false;
-            var clientChat = _repo.AddClient(chatId, out isNewCliente);
+            var clientChat = _unitOfWork.TelegramUsers.AddClient(chatId, out isNewCliente);
 
             //Adiciona mensagem no banco de dados
-            _repo.Add(new Mensagem(clientChat.Id, e.Message.Text, e.Message.Date, false));
-            _repo.SaveChanges();
+            _unitOfWork.MessageHistorys.Add(new MessageHistory(clientChat.Id, e.Message.Text, e.Message.Date, false));
+            _unitOfWork.Complete();
 
             string messageReceived = Functions.Generic.RemoveAccents(e.Message.Text.ToLower());
             if (messageReceived == "ola" || messageReceived == "/start")
@@ -144,11 +145,11 @@ namespace Telegram.WebAPI.services
             {
                 ReceivedMessageStopReceiver(clientChat.Id);
             }
-            else if (clientChat.Status == (int)clientStatus.waitingForTextMessage)
+            else if (clientChat.Status == Domain.Enums.TelegramUserStatus.WaitingForTextMessage)
             {
                 ReceivedMessageReminderText(clientChat.Id, messageReceived);
             }
-            else if (clientChat.Status == (int)clientStatus.waitingForTime)
+            else if (clientChat.Status == Domain.Enums.TelegramUserStatus.WaitingForTime)
             {
                 ReceivedMessageReminderTime(clientChat.Id, messageReceived);
             }
@@ -159,22 +160,22 @@ namespace Telegram.WebAPI.services
         }
         private async void ReceivedMessageReminderTime(int clientId, string messageReceived)
         {
-            var clientToSave = _repo.GetCliente(clientId);
+            var clientToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
             TimeSpan sendTime = new TimeSpan();
             if (TimeSpan.TryParse(messageReceived, out sendTime))
             {
-                clientToSave.RemindTimeToSend = sendTime;
-                clientToSave.Status = (int)clientStatus.complete;
-                if (DateTime.Now.Date + sendTime < DateTime.Now)
-                    clientToSave.LastSend = DateTime.Now; //Se o horário do lembrete é um horário que hoje já passou, registra como já enviado o lembrete. Se isso não for feito, será reenviado no próximo ciclo
-                await sendMessageAsync(clientToSave.TelegramChatId, $"Cadastro criado com sucesso!!!{Environment.NewLine}{Environment.NewLine}Você receberá a mensagem: {clientToSave.TextMessage}{Environment.NewLine}Todos os dias as {clientToSave.RemindTimeToSend.ToString()}");
+                //clientToSave.RemindTimeToSend = sendTime;
+                //clientToSave.Status = (int)clientStatus.complete;
+                //if (DateTime.Now.Date + sendTime < DateTime.Now)
+                //    clientToSave.LastSend = DateTime.Now; //Se o horário do lembrete é um horário que hoje já passou, registra como já enviado o lembrete. Se isso não for feito, será reenviado no próximo ciclo
+                //await sendMessageAsync(clientToSave.TelegramChatId, $"Cadastro criado com sucesso!!!{Environment.NewLine}{Environment.NewLine}Você receberá a mensagem: {clientToSave.TextMessage}{Environment.NewLine}Todos os dias as {clientToSave.RemindTimeToSend.ToString()}");
             }
             else
             {
                 await sendMessageAsync(clientToSave.TelegramChatId, "Não reconheço este formato de horário. O horário precisa estar no formato HH:MM");
             }
-            _repo.Update(clientToSave);
-            _repo.SaveChanges();
+            _unitOfWork.TelegramUsers.Update(clientToSave);
+            _unitOfWork.Complete();
         }
         private async void ReceivedMessageReminder(int clientId)
         {
@@ -208,25 +209,25 @@ namespace Telegram.WebAPI.services
             if (reminderTextMessage == null)
                 return;
 
-            var clientToSave = _repo.GetCliente(clientId);
-            clientToSave.TextMessage = reminderTextMessage;
-            clientToSave.Status = (int)clientStatus.waitingForTime;
+            var clientToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
+            //clientToSave.TextMessage = reminderTextMessage;
+            clientToSave.Status = Domain.Enums.TelegramUserStatus.WaitingForTime;
             await sendMessageAsync(clientToSave.TelegramChatId, "Qual horário você deseja ser lembrado? Precisa ser no formato HH:MM!");
 
-            _repo.Update(clientToSave);
-            _repo.SaveChanges();
+            _unitOfWork.TelegramUsers.Update(clientToSave);
+            _unitOfWork.Complete();
         }
         private async void ReceivedMessageStopReceiver(int clientId)
         {
-            var clientToSave = _repo.GetCliente(clientId);
-            clientToSave.Activated = false;
-            clientToSave.RiverLevel = false;
-            clientToSave.TextMessage = "";
-            clientToSave.Status = (int)clientStatus.newCliente;
-            clientToSave.LastSend = new DateTime();
+            var clientToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
+            //clientToSave.Activated = false;
+            //clientToSave.RiverLevel = false;
+            //clientToSave.TextMessage = "";
+            clientToSave.Status = Domain.Enums.TelegramUserStatus.NewCliente;
+            //clientToSave.LastSend = new DateTime();
             await sendMessageAsync(clientToSave.TelegramChatId, "Removido da fila de envio. Para voltar a receber lembretes ou alertas do nível do rio, envie Olá para iniciar o cadastro.");
-            _repo.Update(clientToSave);
-            _repo.SaveChanges();
+            _unitOfWork.TelegramUsers.Update(clientToSave);
+            _unitOfWork.Complete();
         }
         private async void ReceivedMessageExitMenu(int clientId)
         {
@@ -235,11 +236,11 @@ namespace Telegram.WebAPI.services
         private async void ReceivedMessageConsult(int clientId)
         {
             string lembretes = "";
-            var clientToSave = _repo.GetCliente(clientId);
+            var clientToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
             if (clientToSave != null)
             {
-                if (clientToSave.TextMessage != "")
-                    lembretes = $"Lembrete {clientToSave.TextMessage} às {clientToSave.RemindTimeToSend}";
+                //if (clientToSave.TextMessage != "")
+                //    lembretes = $"Lembrete {clientToSave.TextMessage} às {clientToSave.RemindTimeToSend}";
             }
             if (lembretes == "")
             {
@@ -264,8 +265,8 @@ namespace Telegram.WebAPI.services
             {
                 await sendMessageAsync(clientToSave.TelegramChatId, lembretes);
             }
-            _repo.Update(clientToSave);
-            _repo.SaveChanges();
+            _unitOfWork.TelegramUsers.Update(clientToSave);
+            _unitOfWork.Complete();
         }
         private async void ReceivedMessageCommandNotUnderstand(int clientId)
         {
@@ -314,24 +315,24 @@ namespace Telegram.WebAPI.services
         private async void ReceivedMessageStart(int clientId)
         {
             await sendMessageAsync(clientId, "Qual mensagem você deseja receber ao ser lembrado?");
-            var clientChatToSave = _repo.GetCliente(clientId);
-            clientChatToSave.Activated = true;
-            clientChatToSave.Status = (int)clientStatus.waitingForTextMessage;
-            _repo.Update(clientChatToSave);
-            _repo.SaveChanges();
+            var clientChatToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
+           // clientChatToSave.Activated = true;
+            clientChatToSave.Status = Domain.Enums.TelegramUserStatus.WaitingForTextMessage;
+            _unitOfWork.TelegramUsers.Update(clientChatToSave);
+            _unitOfWork.Complete();
         }
         private async void ReveivedMessageRiverLevel(int clientId)
         {
-            var clientChatToSave = _repo.GetCliente(clientId);
-            clientChatToSave.RiverLevel = true;
+            var clientChatToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
+            clientChatToSave.SendRiverLevel = true;
             await sendMessageAsync(clientChatToSave.TelegramChatId, "Feito!\n\nVocê começará a receber as medições do nível do rio a partir de agora.");
-            _repo.Update(clientChatToSave);
-            _repo.SaveChanges();
+            _unitOfWork.TelegramUsers.Update(clientChatToSave);
+            _unitOfWork.Complete();
         }
 
         private async Task<bool> sendMessageAsync(int clientId, string text, IReplyMarkup replyMarkup = null)
         {
-            var client = _repo.GetCliente(clientId, true);
+            var client = _unitOfWork.TelegramUsers.GetCliente(clientId, true);
             if (client == null)
             {
                 return false;
@@ -376,31 +377,31 @@ namespace Telegram.WebAPI.services
                     lastRiverLevel = riverLevel + riverLevelHour;
                 }
 
-                foreach (var client in _repo.GetAllClientes())
+                foreach (var client in _unitOfWork.TelegramUsers.GetAllClientes())
                 {
-                    //enviar nível do rio
-                    if (enviarNivel && client.RiverLevel)
-                    {
-                        await sendMessageAsync(client.TelegramChatId, $"O nível do rio está {riverLevel} às {riverLevelHour}");
-                    }
-                    //enviar lembretes criados
-                    if (client.TextMessage != "" && client.Status == (int)clientStatus.complete && client.Activated == true) //apenas clientes com o cadastro de um lembrete completo
-                    {
-                        if ((DateTime.Now.Date + client.RemindTimeToSend) <= DateTime.Now && client.LastSend.Date < DateTime.Now.Date) //considerar enviar 
-                        {
-                            if (client.LastSend == new DateTime())
-                            {
-                                await sendMessageAsync(client.TelegramChatId, client.TextMessage);
-                            }
-                            else if (client.LastSend.AddMinutes(-5) < DateTime.Now)
-                            {
-                                await sendMessageAsync(client.TelegramChatId, client.TextMessage);
-                            }
-                            client.LastSend = DateTime.Now;
-                            _repo.Update(client);
-                            _repo.SaveChanges();
-                        }
-                    }
+                    ////enviar nível do rio
+                    //if (enviarNivel && client.RiverLevel)
+                    //{
+                    //    await sendMessageAsync(client.TelegramChatId, $"O nível do rio está {riverLevel} às {riverLevelHour}");
+                    //}
+                    ////enviar lembretes criados
+                    //if (client.TextMessage != "" && client.Status == (int)clientStatus.complete && client.Activated == true) //apenas clientes com o cadastro de um lembrete completo
+                    //{
+                    //    if ((DateTime.Now.Date + client.RemindTimeToSend) <= DateTime.Now && client.LastSend.Date < DateTime.Now.Date) //considerar enviar 
+                    //    {
+                    //        if (client.LastSend == new DateTime())
+                    //        {
+                    //            await sendMessageAsync(client.TelegramChatId, client.TextMessage);
+                    //        }
+                    //        else if (client.LastSend.AddMinutes(-5) < DateTime.Now)
+                    //        {
+                    //            await sendMessageAsync(client.TelegramChatId, client.TextMessage);
+                    //        }
+                    //        client.LastSend = DateTime.Now;
+                    //        _repo.Update(client);
+                    //        _repo.SaveChanges();
+                    //    }
+                    //}
 
                 }
             }
@@ -443,12 +444,6 @@ namespace Telegram.WebAPI.services
             }
 
         }
-        public enum clientStatus
-        {
-            newCliente = 0,
-            waitingForTextMessage = 1,
-            waitingForTime = 2,
-            complete = 3
-        }
+     
     }
 }

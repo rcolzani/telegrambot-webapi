@@ -13,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using server.Middlewares;
 using Telegram.WebAPI.Data;
+using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.services;
 
@@ -20,11 +22,13 @@ namespace Telegram.WebAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            webHostEnvironment = env;
         }
 
+        public IWebHostEnvironment webHostEnvironment { get; set; }
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -34,6 +38,8 @@ namespace Telegram.WebAPI
                            context => context.UseMySql(Configuration.GetConnectionString("JawsDB")), ServiceLifetime.Singleton);
 
             Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
+            Functions.Settings.ControllerActionsPassword = Configuration["ControllerActionsPassword"];
+
             services.AddControllers().AddNewtonsoftJson(options =>
              options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
              );
@@ -41,11 +47,22 @@ namespace Telegram.WebAPI
 
             services.AddSignalR();
 
-            services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConfiguration>(Configuration);
 
             services.AddHostedService<TelegramBotService>();
+
+            var origins = new string[2];
+            origins.SetValue("https://telbot.rcolzani.com", 0);
+            origins.SetValue("https://focused-borg-5cc3c6.netlify.app", 1);
+
+            if (webHostEnvironment.IsDevelopment())
+            {
+                Array.Resize(ref origins, 4);
+                origins.SetValue("http://localhost:3000", 2);
+                origins.SetValue("https://localhost:3000", 3);
+            }
 
             services.AddCors(options =>
            {
@@ -53,11 +70,7 @@ namespace Telegram.WebAPI
                {
                    policy.AllowAnyHeader()
                        .AllowAnyMethod()
-                       .WithOrigins(new string[] {
-                           "http://localhost:3000",
-                       "https://localhost:3000",
-                       "https://telbot.rcolzani.com",
-                       "https://focused-borg-5cc3c6.netlify.app"})
+                       .WithOrigins(origins)
                        .AllowCredentials();
                });
            });

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Telegram.WebAPI.Data;
+using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Dtos;
 
 namespace Telegram.WebAPI.Controllers
@@ -13,11 +14,11 @@ namespace Telegram.WebAPI.Controllers
     [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase
     {
-        private readonly IRepository _repo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<TelegramBotController> _logger;
-        public TelegramBotController(IRepository repo, ILogger<TelegramBotController> logger)
+        public TelegramBotController(IUnitOfWork unitOfWork, ILogger<TelegramBotController> logger)
         {
-            _repo = repo;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
         [HttpGet]
@@ -29,7 +30,16 @@ namespace Telegram.WebAPI.Controllers
         [HttpPost]
         public IActionResult Post(StatusChangeDto statusChange)
         {
-            Functions.Settings.TelegramBotActivated = statusChange.Activate;
+            if (statusChange.passwd != Functions.Settings.ControllerActionsPassword)
+            {
+                return BadRequest("Senha incorreta ou não informada");
+            }
+            else if (statusChange.Activate == null)
+            {
+                return BadRequest("Status não informado");
+            }
+
+            Functions.Settings.TelegramBotActivated = (bool)statusChange.Activate;
             return Ok(Functions.Settings.TelegramBotActivated);
         }
 
@@ -38,11 +48,19 @@ namespace Telegram.WebAPI.Controllers
         {
             try
             {
-                var messages = await _repo.GetAllMessagesAsync();
-                var clients = await _repo.GetAllClientesAsync();
+                var clients = await _unitOfWork.TelegramUsers.GetAllClientesAsync();
+                int resultado;
+
+                if (clients.Count() == 0)
+                {
+                    _unitOfWork.TelegramUsers.Add(new Domain.Entities.TelegramUser { Name = "teste", TelegramChatId = 852455});
+                    resultado = _unitOfWork.Complete();
+                }
+
+                var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync(); 
                 var quantity = new Hubs.Models.StatisticsMain(
                     clients.Length,
-                    clients.Where(c => c.Activated).Count(), messages.Where(m => m.MessageSent == false).Count(),
+                    clients.Count(), messages.Where(m => m.MessageSent == false).Count(),
                     messages.Where(m => m.MessageSent).Count()
                      );
                 return Ok(quantity);
