@@ -54,9 +54,6 @@ namespace Telegram.WebAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -65,6 +62,9 @@ namespace Telegram.WebAPI.Migrations
 
                     b.Property<DateTime>("RemindedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TelegramUserId")
                         .HasColumnType("int");

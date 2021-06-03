@@ -12,14 +12,14 @@ namespace Telegram.WebAPI.Domain.Repositories
     public class TelegramUserRepository : Repository<TelegramUser>, ITelegramUserRepository
     {
         public TelegramUserRepository(TelegramContext _context) : base(_context) { }
-        public TelegramUser AddClient(int chatId, out bool isNewClient)
+        public TelegramUser AddClient(int chatId, out bool isNewClient, string name)
         {
             isNewClient = false;
             var clientChat = GetClienteByTelegramId(chatId, true);
 
             if (clientChat == null)
             {
-                Add(new TelegramUser(chatId, Enums.TelegramUserStatus.NewCliente));
+                Add(new TelegramUser(chatId, Enums.TelegramUserStatus.NewCliente, name));
                 _context.SaveChanges();
                 clientChat = GetClienteByTelegramId(chatId, true);
                 isNewClient = true;
@@ -39,6 +39,18 @@ namespace Telegram.WebAPI.Domain.Repositories
             IQueryable<TelegramUser> query = _context.TelegramUser;
             query = query.OrderBy(a => a.Id);
             return await query.ToArrayAsync();
+        }
+
+        public List<TelegramUser> GetAllUsersWithReminderActivate()
+        {
+            var dados = _context.TelegramUser.Where(u => u.Reminders.Where(r => r.Status == Enums.ReminderStatus.Activated).Count() > 0);
+            return dados.ToList();
+        }
+
+        public List<TelegramUser> GetAllUsersWithSendRiverActivate()
+        {
+            var dados = _context.TelegramUser.Where(c => c.SendRiverLevel.Equals(true));
+            return dados.ToList();
         }
 
         public TelegramUser GetCliente(int id, bool asNoTracking = false)

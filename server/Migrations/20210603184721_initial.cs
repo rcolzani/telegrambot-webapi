@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Telegram.WebAPI.Migrations
 {
-    public partial class mudancarefatoracaounitofwork : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -61,7 +61,7 @@ namespace Telegram.WebAPI.Migrations
                     TextMessage = table.Column<string>(nullable: true),
                     RemindTimeToSend = table.Column<TimeSpan>(nullable: false),
                     RemindedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
                     TelegramUserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

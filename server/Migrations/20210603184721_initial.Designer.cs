@@ -9,8 +9,8 @@ using Telegram.WebAPI.Data;
 namespace Telegram.WebAPI.Migrations
 {
     [DbContext(typeof(TelegramContext))]
-    [Migration("20210601000159_mudanca-refatoracao-unitofwork")]
-    partial class mudancarefatoracaounitofwork
+    [Migration("20210603184721_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,9 +56,6 @@ namespace Telegram.WebAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -67,6 +64,9 @@ namespace Telegram.WebAPI.Migrations
 
                     b.Property<DateTime>("RemindedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TelegramUserId")
                         .HasColumnType("int");

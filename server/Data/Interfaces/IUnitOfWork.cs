@@ -9,6 +9,7 @@ namespace Telegram.WebAPI.Domain.Interfaces
     {
         IMessageHistoryRepository MessageHistorys { get; }
         ITelegramUserRepository TelegramUsers { get; }
+        IReminderRepository Reminders { get; }
         int Complete();
     }
 }

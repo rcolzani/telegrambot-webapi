@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using server.Middlewares;
+using Telegram.WebAPI.Application;
 using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Repositories;
@@ -48,6 +49,9 @@ namespace Telegram.WebAPI
             services.AddSignalR();
 
             services.AddSingleton<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<TelegramBotApplication>();
+            services.AddSingleton<ReminderApplication>();
+            services.AddSingleton<RiverLevelApplication>();
 
             services.AddSingleton<IConfiguration>(Configuration);
 

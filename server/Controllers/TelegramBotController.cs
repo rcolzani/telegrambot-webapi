@@ -49,18 +49,10 @@ namespace Telegram.WebAPI.Controllers
             try
             {
                 var clients = await _unitOfWork.TelegramUsers.GetAllClientesAsync();
-                int resultado;
-
-                if (clients.Count() == 0)
-                {
-                    _unitOfWork.TelegramUsers.Add(new Domain.Entities.TelegramUser { Name = "teste", TelegramChatId = 852455});
-                    resultado = _unitOfWork.Complete();
-                }
-
                 var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync(); 
                 var quantity = new Hubs.Models.StatisticsMain(
                     clients.Length,
-                    clients.Count(), messages.Where(m => m.MessageSent == false).Count(),
+                    clients.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >=1 ).Count(), messages.Where(m => m.MessageSent == false).Count(),
                     messages.Where(m => m.MessageSent).Count()
                      );
                 return Ok(quantity);

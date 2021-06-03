@@ -20,6 +20,8 @@ namespace Telegram.WebAPI.Data
 
         public ITelegramUserRepository TelegramUsers { get; private set; }
 
+        public IReminderRepository Reminders { get; private set; }
+
         public int Complete()
         {
             return _context.SaveChanges();
