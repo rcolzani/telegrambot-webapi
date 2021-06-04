@@ -44,12 +44,14 @@ namespace Telegram.WebAPI.Domain.Repositories
         public List<TelegramUser> GetAllUsersWithReminderActivate()
         {
             var dados = _context.TelegramUser.Where(u => u.Reminders.Where(r => r.Status == Enums.ReminderStatus.Activated).Count() > 0);
+            dados = dados.AsNoTracking();
             return dados.ToList();
         }
 
         public List<TelegramUser> GetAllUsersWithSendRiverActivate()
         {
             var dados = _context.TelegramUser.Where(c => c.SendRiverLevel.Equals(true));
+            dados = dados.AsNoTracking();
             return dados.ToList();
         }
 
@@ -75,7 +77,7 @@ namespace Telegram.WebAPI.Domain.Repositories
             query = query.Where(u => u.TelegramChatId == id);
 
             if (asNoTracking)
-                query.AsNoTracking();
+                query = query.AsNoTracking();
 
             return query.FirstOrDefault();
         }

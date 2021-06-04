@@ -166,7 +166,7 @@ namespace Telegram.WebAPI.Application
                 return;
 
             var clientToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
-            var reminder = new Reminder(reminderTextMessage);
+            var reminder = new Reminder(clientId,reminderTextMessage);
             await sendMessageAsync(clientToSave.TelegramChatId, "Qual horário você deseja ser lembrado? Precisa ser no formato HH:MM!");
             _unitOfWork.Reminders.Update(reminder);
             _unitOfWork.Complete();

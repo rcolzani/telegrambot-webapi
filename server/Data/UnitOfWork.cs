@@ -15,6 +15,7 @@ namespace Telegram.WebAPI.Data
             _context = context;
             MessageHistorys = new MessageHistoryRepository(_context);
             TelegramUsers = new TelegramUserRepository(_context);
+            Reminders = new ReminderRepository(_context);
         }
         public IMessageHistoryRepository MessageHistorys { get; private set; }
 

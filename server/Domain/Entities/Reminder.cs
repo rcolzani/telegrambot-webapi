@@ -8,9 +8,11 @@ namespace Telegram.WebAPI.Domain.Entities
 {
     public class Reminder : Entity
     {
-        public Reminder(string textMessage)
+        public Reminder() { }
+        public Reminder(int userId, string textMessage)
         {
             this.TextMessage = textMessage;
+            this.TelegramUserId = userId;
             this.Status = ReminderStatus.WaitingForTime;
         }
         public string TextMessage { get; private set; }
