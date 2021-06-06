@@ -18,14 +18,15 @@ namespace Telegram.WebAPI.Domain.Entities
             this.Name = name;
 
             this.CreatedAt = DateTime.Now;
+            this.UpdatedAt = DateTime.Now;
         }
         public long TelegramChatId { get; set; }
         public string Name { get; set; }
         public TelegramUserStatus Status { get; set; }
         public bool SendRiverLevel { get; set; }
 
-        public virtual List<Reminder> Reminders { get; set; }
-        public virtual List<MessageHistory> MessageHistory { get; set; }
+        public List<Reminder> Reminders { get; set; }
+        public List<MessageHistory> MessageHistory { get; set; }
 
         public List<Reminder> GetActiveReminders()
         {
@@ -40,6 +41,7 @@ namespace Telegram.WebAPI.Domain.Entities
 
             this.SendRiverLevel = false;
             this.Status = Domain.Enums.TelegramUserStatus.NewCliente;
+            this.UpdatedAt = DateTime.Now;
         }
     }
 }

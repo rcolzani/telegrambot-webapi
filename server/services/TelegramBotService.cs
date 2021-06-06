@@ -79,9 +79,16 @@ namespace Telegram.WebAPI.services
 
                 if (telegramBotRunning)
                 {
+                    while (Settings.TelegramBotReceivingMessage)
+                    {
+                        //enquanto estiver processando uma mensagem recebida, não faz o envio de mensagens
+                        await Task.Delay(1000, stoppingToken);
+                    }
+                    Settings.SendingMessageStart();
                     await _reminderApplication.SendReminders();
                     await _riverLevelApp.SendRiverLevel();
                     await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "checando mensagens", DateTime.Now), false);
+                    Settings.SendingMessageStop();
                 }
 
                 await Task.Delay(60000, stoppingToken);
@@ -95,10 +102,16 @@ namespace Telegram.WebAPI.services
 
         private void botMessageReceiver(object sender, MessageEventArgs e)
         {
+            while (Settings.TelegramBotSendingMessages)
+            {
+                Task.Delay(1000);
+            }
+            Settings.ReceivingMessageStart();
             if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text)
             {
                 _telegramBotApplication.PrepareQuestionnaires(e);
-            }   
+            }
+            Settings.ReceivingMessageStop();
         }
         private void startReceiving()
         {

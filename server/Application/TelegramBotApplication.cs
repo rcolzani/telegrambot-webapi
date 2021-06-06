@@ -32,6 +32,9 @@ namespace Telegram.WebAPI.Application
 
             bool isNewCliente = false;
             var clientChat = _unitOfWork.TelegramUsers.AddClient(chatId, out isNewCliente,  $"{e.Message.Chat.FirstName} {e.Message.Chat.LastName}".Trim());
+            var userReminders = _unitOfWork.Reminders.GetAllRemindersByUserAsync(clientChat.Id).Result;
+
+            var userLastReminder = userReminders?.OrderByDescending(u => u.CreatedAt).FirstOrDefault();
 
             //Adiciona mensagem no banco de dados
             _unitOfWork.MessageHistorys.Add(new MessageHistory(clientChat.Id, e.Message.Text, e.Message.Date, false));
@@ -42,11 +45,11 @@ namespace Telegram.WebAPI.Application
             {
                 ReceivedMessageHello(clientChat.Id, e.Message.Chat.FirstName, isNewCliente);
             }
-            else if (clientChat.Status == Domain.Enums.TelegramUserStatus.WaitingForTextMessage)
+            else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTextMessage)
             {
                 ReceivedMessageReminderText(clientChat.Id, messageReceived);
             }
-            else if (clientChat.Status == Domain.Enums.TelegramUserStatus.WaitingForTime)
+            else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTime)
             {
                 ReceivedMessageReminderTime(clientChat.Id, messageReceived);
             }
@@ -82,6 +85,7 @@ namespace Telegram.WebAPI.Application
         private async void ReceivedMessageReminderTime(int clientId, string messageReceived)
         {
             var clientToSave = _unitOfWork.TelegramUsers.GetCliente(clientId);
+            var reminders = _unitOfWork.Reminders.GetAllRemindersByUserAsync(clientId);
             TimeSpan sendTime = new TimeSpan();
             if (TimeSpan.TryParse(messageReceived, out sendTime))
             {

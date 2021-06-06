@@ -15,13 +15,13 @@ namespace Telegram.WebAPI.Domain.Repositories
         public TelegramUser AddClient(int chatId, out bool isNewClient, string name)
         {
             isNewClient = false;
-            var clientChat = GetClienteByTelegramId(chatId, true);
+            var clientChat = GetClienteByTelegramId(chatId, false);
 
             if (clientChat == null)
             {
                 Add(new TelegramUser(chatId, Enums.TelegramUserStatus.NewCliente, name));
                 _context.SaveChanges();
-                clientChat = GetClienteByTelegramId(chatId, true);
+                clientChat = GetClienteByTelegramId(chatId, false);
                 isNewClient = true;
             }
             return clientChat;

@@ -49,12 +49,13 @@ namespace Telegram.WebAPI.Controllers
             try
             {
                 var clients = await _unitOfWork.TelegramUsers.GetAllClientesAsync();
-                var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync(); 
-                var quantity = new Hubs.Models.StatisticsMain(
-                    clients.Length,
-                    clients.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >=1 ).Count(), messages.Where(m => m.MessageSent == false).Count(),
-                    messages.Where(m => m.MessageSent).Count()
-                     );
+                var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync();
+
+                var activeClientsQuantity = clients.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >= 1).Count();
+                var messageReceivedQuantity = messages.Where(m => m.MessageSent == false).Count();
+                var messageSentQuantity = messages.Where(m => m.MessageSent).Count();
+
+                var quantity = new Hubs.Models.StatisticsMain(clients.Length, activeClientsQuantity, messageReceivedQuantity, messageSentQuantity);
                 return Ok(quantity);
             }
             catch (Exception ex)
