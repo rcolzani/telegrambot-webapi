@@ -32,6 +32,15 @@ namespace Telegram.WebAPI.Domain.Entities
         {
             return Reminders.Where(r => r.Status == ReminderStatus.Activated).ToList();
         }
+        public void StartReceiveRiverLevel()
+        {
+            this.SendRiverLevel = true;
+        }
+        public void StopReceiveRiverLevel()
+        {
+            this.SendRiverLevel = false;
+        }
+
         public void StopReminders()
         {
             foreach (var reminder in Reminders)
