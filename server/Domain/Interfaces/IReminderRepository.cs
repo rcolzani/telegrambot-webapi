@@ -9,6 +9,7 @@ namespace Telegram.WebAPI.Domain.Interfaces
 {
     public interface IReminderRepository : IRepository<Reminder>
     {
-        Task<List<Reminder>> GetAllRemindersByUserAsync(int clienteId);
+        List<Reminder> GetAllRemindersByUser(int clienteId);
+        List<Reminder> GetAllRemindersActive();
     }
 }

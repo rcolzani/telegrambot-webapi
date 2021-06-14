@@ -13,8 +13,13 @@ namespace Telegram.WebAPI.Domain.Entities
         {
             this.TextMessage = textMessage;
             this.TelegramUserId = userId;
-            this.Status = ReminderStatus.WaitingForTime;
+            this.Status = ReminderStatus.WaitingForTextMessage;
             this.CreatedAt = DateTime.Now;
+        }
+        public void AddReminderText(string texto)
+        {
+            this.TextMessage = texto;
+            this.Status = ReminderStatus.WaitingForTime;
         }
         public string TextMessage { get; private set; }
         public TimeSpan RemindTimeToSend { get; private set; }

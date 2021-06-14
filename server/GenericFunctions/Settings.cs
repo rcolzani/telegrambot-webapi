@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Functions
 {
     public static class Settings

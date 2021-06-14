@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Domain.Entities;
+using Telegram.WebAPI.Domain.Enums;
 using Telegram.WebAPI.Domain.Interfaces;
 
 namespace Telegram.WebAPI.Domain.Repositories
@@ -13,11 +14,17 @@ namespace Telegram.WebAPI.Domain.Repositories
     {
         public ReminderRepository(TelegramContext _context) : base(_context) { }
 
-        public Task<List<Reminder>> GetAllRemindersByUserAsync(int userId)
+        public List<Reminder> GetAllRemindersActive()
         {
-            var dados = _context.Reminder.Where(r => r.TelegramUserId.Equals(userId));
+            var dados = _context.Reminder.Where(r => r.Status.Equals(ReminderStatus.Activated)).OrderByDescending(u => u.CreatedAt);
+            return dados.ToList();
+        }
 
-            return dados.ToListAsync();
+        public List<Reminder> GetAllRemindersByUser(int userId)
+        {
+            var dados = _context.Reminder.Where(r => r.TelegramUserId.Equals(userId)).OrderByDescending(u => u.CreatedAt);
+
+            return dados.ToList();
         }
     }
 }

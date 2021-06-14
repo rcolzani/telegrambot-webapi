@@ -26,7 +26,6 @@ namespace Telegram.WebAPI.Application
             _unitOfWork = unitOfWork;
             _telegramBotApp = telegramBotApplication;
         }
-
         public async Task<bool> SendRiverLevel()
         {
             try
@@ -49,7 +48,7 @@ namespace Telegram.WebAPI.Application
 
                 foreach (var user in _unitOfWork.TelegramUsers.GetAllUsersWithSendRiverActivate())
                 {
-                    await _telegramBotApp.sendMessageAsync(user.Id, $"O nível do rio está {riverLevel} às {riverLevelHour}");
+                    await _telegramBotApp.sendMessageAsync(user.TelegramChatId, $"O nível do rio está {riverLevel} às {riverLevelHour}");
                 }
                 return true;
             }

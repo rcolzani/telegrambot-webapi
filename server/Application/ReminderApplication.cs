@@ -29,26 +29,23 @@ namespace Telegram.WebAPI.Application
         {
             try
             {
-                foreach (var user in _unitOfWork.TelegramUsers.GetAllUsersWithReminderActivate())
+                foreach (var reminder in _unitOfWork.Reminders.GetAllRemindersActive())
                 {
-                    foreach (var reminder in user.GetActiveReminders())
+                    if ((DateTime.Now.Date + reminder.RemindTimeToSend) <= DateTime.Now && reminder.RemindedAt.Date < DateTime.Now.Date) //considerar enviar 
                     {
-                        if ((DateTime.Now.Date + reminder.RemindTimeToSend) <= DateTime.Now && reminder.RemindedAt.Date < DateTime.Now.Date) //considerar enviar 
+                        if (reminder.RemindedAt == new DateTime())
                         {
-                            if (reminder.RemindedAt == new DateTime())
-                            {
-                                await _telegramBotApp.sendMessageAsync(reminder.TelegramUserId, reminder.TextMessage);
-                            }
-                            else if (reminder.RemindedAt.AddMinutes(-5) < DateTime.Now)
-                            {
-                                await _telegramBotApp.sendMessageAsync(reminder.TelegramUserId, reminder.TextMessage);
-                            }
-                            reminder.SetReminded();
-                            _unitOfWork.Reminders.Update(reminder);
-                            _unitOfWork.Complete();
+                            await _telegramBotApp.sendMessageAsync(reminder.TelegramUser.TelegramChatId, reminder.TextMessage);
                         }
+                        else if (reminder.RemindedAt.AddMinutes(-5) < DateTime.Now)
+                        {
+                            await _telegramBotApp.sendMessageAsync(reminder.TelegramUser.TelegramChatId, reminder.TextMessage);
+                        }
+                        reminder.SetReminded();
+                        _unitOfWork.Reminders.Update(reminder);
                     }
                 }
+                _unitOfWork.Complete();
                 return true;
             }
             catch (Exception e)

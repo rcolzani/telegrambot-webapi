@@ -11,8 +11,9 @@ namespace Telegram.WebAPI.Domain.Repositories
 {
     public class MessageHistoryRepository : Repository<MessageHistory>, IMessageHistoryRepository
     {
+       
         public MessageHistoryRepository(TelegramContext _context) : base(_context) { }
-
+      
         public async Task<MessageHistory[]> GetAllMessagesAsync()
         {
             try

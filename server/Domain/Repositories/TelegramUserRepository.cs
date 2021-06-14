@@ -19,9 +19,11 @@ namespace Telegram.WebAPI.Domain.Repositories
 
             if (clientChat == null)
             {
-                Add(new TelegramUser(chatId, Enums.TelegramUserStatus.NewCliente, name));
+                clientChat = new TelegramUser(chatId, Enums.TelegramUserStatus.NewCliente, name);
+                _context.Add(clientChat);
                 _context.SaveChanges();
-                clientChat = GetClienteByTelegramId(chatId, false);
+
+                //clientChat = GetClienteByTelegramId(chatId, false);
                 isNewClient = true;
             }
             return clientChat;
@@ -29,35 +31,47 @@ namespace Telegram.WebAPI.Domain.Repositories
 
         public TelegramUser[] GetAllClientes()
         {
-            IQueryable<TelegramUser> query = _context.TelegramUser;
+            IQueryable<TelegramUser> query;
+
+            query = _context.TelegramUser;
+
             query = query.OrderBy(a => a.Id);
             return query.ToArray();
         }
 
         public async Task<TelegramUser[]> GetAllClientesAsync()
         {
-            IQueryable<TelegramUser> query = _context.TelegramUser;
+            IQueryable<TelegramUser> query;
+            query = _context.TelegramUser;
             query = query.OrderBy(a => a.Id);
             return await query.ToArrayAsync();
         }
 
         public List<TelegramUser> GetAllUsersWithReminderActivate()
         {
-            var dados = _context.TelegramUser.Where(u => u.Reminders.Where(r => r.Status == Enums.ReminderStatus.Activated).Count() > 0);
+            IQueryable<TelegramUser> dados;
+
+            dados = _context.TelegramUser.Where(u => u.Reminders.Where(r => r.Status == Enums.ReminderStatus.Activated).Count() > 0);
+
             dados = dados.AsNoTracking();
             return dados.ToList();
         }
 
         public List<TelegramUser> GetAllUsersWithSendRiverActivate()
         {
-            var dados = _context.TelegramUser.Where(c => c.SendRiverLevel.Equals(true));
+            IQueryable<TelegramUser> dados;
+
+            dados = _context.TelegramUser.Where(c => c.SendRiverLevel.Equals(true));
+
             dados = dados.AsNoTracking();
             return dados.ToList();
         }
 
         public TelegramUser GetCliente(int id, bool asNoTracking = false)
         {
-            IQueryable<TelegramUser> query = _context.TelegramUser;
+            IQueryable<TelegramUser> query;
+
+            query = _context.TelegramUser;
 
             query = query.Where(u => u.Id == id);
             return query.FirstOrDefault();
@@ -65,7 +79,9 @@ namespace Telegram.WebAPI.Domain.Repositories
 
         public async Task<TelegramUser> GetClienteAsync(int id, bool asNoTracking = false)
         {
-            IQueryable<TelegramUser> query = _context.TelegramUser;
+            IQueryable<TelegramUser> query;
+
+            query = _context.TelegramUser;
 
             query = query.Where(u => u.Id == id);
             return await query.FirstOrDefaultAsync();
@@ -73,22 +89,28 @@ namespace Telegram.WebAPI.Domain.Repositories
 
         public TelegramUser GetClienteByTelegramId(long id, bool asNoTracking = false)
         {
-            IQueryable<TelegramUser> query = _context.TelegramUser;
+            IQueryable<TelegramUser> query;
+
+            query = _context.TelegramUser;
+
             query = query.Where(u => u.TelegramChatId == id);
 
-            if (asNoTracking)
-                query = query.AsNoTracking();
+            //if (asNoTracking)
+            //query = query.AsNoTracking();
 
             return query.FirstOrDefault();
         }
 
         public async Task<TelegramUser> GetClienteByTelegramIdAsync(long id, bool asNoTracking = false)
         {
-            IQueryable<TelegramUser> query = _context.TelegramUser;
+            IQueryable<TelegramUser> query;
+
+            query = _context.TelegramUser;
+
             query = query.Where(u => u.TelegramChatId == id);
 
-            if (asNoTracking)
-                query.AsNoTracking();
+            //if (asNoTracking)
+             //   query.AsNoTracking();
 
             return await query.FirstOrDefaultAsync();
         }

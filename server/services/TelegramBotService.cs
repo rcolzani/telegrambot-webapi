@@ -17,6 +17,9 @@ using Functions;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Application;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Telegram.WebAPI.services
 {
@@ -25,9 +28,12 @@ namespace Telegram.WebAPI.services
     /// </summary>
     public class TelegramBotService : IHostedService
     {
-         private readonly string _token = Functions.Settings.TelegramToken;
+        private readonly string _token = Functions.Settings.TelegramToken;
+        ILogger<TelegramBotService> _logger;
         private TelegramBotClient bot;
-      
+
+        private bool recebendoMensagem = false;
+
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
@@ -35,8 +41,18 @@ namespace Telegram.WebAPI.services
         private TelegramBotApplication _telegramBotApplication;
         private ReminderApplication _reminderApplication;
         private RiverLevelApplication _riverLevelApp;
-        public TelegramBotService(IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication, ReminderApplication reminderApplication, RiverLevelApplication riverLevelApp )
+
+
+        private class tempMessages
         {
+            public MessageEventArgs message { get; set; }
+            public bool Processada { get; set; }
+        }
+
+        private List<tempMessages> mensagensNaFila;
+        public TelegramBotService(IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication, ReminderApplication reminderApplication, RiverLevelApplication riverLevelApp, ILogger<TelegramBotService> logger)
+        {
+            _logger = logger;
             _chatHub = chatHub;
 
             _telegramBotApplication = telegramBotApplication;
@@ -48,6 +64,8 @@ namespace Telegram.WebAPI.services
             bot = new TelegramBotClient(_token);
             bot.OnMessage += botMessageReceiver;
             Settings.TelegramBotActivated = true;
+
+            mensagensNaFila = new List<tempMessages>();
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -63,37 +81,64 @@ namespace Telegram.WebAPI.services
         }
         protected virtual async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //Esta Task é apenas para o service ficar rodando como HostedService
-            do
+            try
             {
-                if (telegramBotRunning && Settings.TelegramBotActivated == false)
+                _logger.LogInformation("Entrou na thread");
+                DateTime riverLevelNextSend = DateTime.Now;
+                DateTime reminderNextSend = DateTime.Now;
+                //Esta Task é apenas para o service ficar rodando como HostedService
+                do
                 {
-                    stopReceiving();
-                    await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi parado.", DateTime.Now), false);
-                }
-                else if (telegramBotRunning == false && Settings.TelegramBotActivated)
-                {
-                    startReceiving();
-                    await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi iniciado.", DateTime.Now), false);
-                }
-
-                if (telegramBotRunning)
-                {
-                    while (Settings.TelegramBotReceivingMessage)
+                    _logger.LogInformation("Entrou no loop");
+                    foreach (var mensagem in mensagensNaFila.Where(m => m.Processada.Equals(false)).ToList())
                     {
-                        //enquanto estiver processando uma mensagem recebida, não faz o envio de mensagens
-                        await Task.Delay(1000, stoppingToken);
+                        _logger.LogInformation("Processando mensagens recebidas");
+                        await _telegramBotApplication.PrepareQuestionnaires(mensagem.message);
+                        mensagem.Processada = true;
                     }
-                    Settings.SendingMessageStart();
-                    await _reminderApplication.SendReminders();
-                    await _riverLevelApp.SendRiverLevel();
-                    await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "checando mensagens", DateTime.Now), false);
-                    Settings.SendingMessageStop();
-                }
 
-                await Task.Delay(60000, stoppingToken);
+                    if (telegramBotRunning && Settings.TelegramBotActivated == false)
+                    {
+                        stopReceiving();
+                        await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi parado.", DateTime.Now), false);
+                    }
+                    else if (telegramBotRunning == false && Settings.TelegramBotActivated)
+                    {
+                        startReceiving();
+                        await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi iniciado.", DateTime.Now), false);
+                    }
+
+                    if (telegramBotRunning)
+                    {
+                        Settings.SendingMessageStart();
+
+                        if (reminderNextSend < DateTime.Now)
+                        {
+                            await _reminderApplication.SendReminders();
+                            reminderNextSend = DateTime.Now.AddMinutes(1);
+                        }
+                        if(riverLevelNextSend< DateTime.Now)
+                        {
+                            await _riverLevelApp.SendRiverLevel();
+                            riverLevelNextSend = DateTime.Now.AddMinutes(3);
+                        }
+                        await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "checando mensagens", DateTime.Now), false);
+                        Settings.SendingMessageStop();
+                    }
+
+                    await Task.Delay(500, stoppingToken);
+
+                    _logger.LogInformation("Finalizou loop");
+                }
+                while (!stoppingToken.IsCancellationRequested);
             }
-            while (!stoppingToken.IsCancellationRequested);
+            catch (Exception ex)
+            {
+                Functions.Generic.LogException(ex);
+                _logger.LogError(ex.ToString());
+                throw;
+            }
+         
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
@@ -102,16 +147,29 @@ namespace Telegram.WebAPI.services
 
         private void botMessageReceiver(object sender, MessageEventArgs e)
         {
-            while (Settings.TelegramBotSendingMessages)
-            {
-                Task.Delay(1000);
-            }
-            Settings.ReceivingMessageStart();
-            if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text)
-            {
-                _telegramBotApplication.PrepareQuestionnaires(e);
-            }
-            Settings.ReceivingMessageStop();
+
+            mensagensNaFila.Add(new tempMessages { Processada = false, message = e});
+
+            mensagensNaFila.RemoveAll(m => m.Processada.Equals(true));
+
+            //Thread.Sleep(1000);
+            //while (Settings.TelegramBotSendingMessages || Settings.TelegramBotReceivingMessage)
+            //{
+            //    Thread.Sleep(1000);
+            //}
+
+            //Settings.ReceivingMessageStart();
+            //if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text)
+            //{
+            //    while (recebendoMensagem)
+            //    {
+            //        Thread.Sleep(1000);
+            //    }
+            //    recebendoMensagem = true;
+            //    _telegramBotApplication.PrepareQuestionnaires(e);
+            //}
+            //Settings.ReceivingMessageStop();
+            //recebendoMensagem = false;
         }
         private void startReceiving()
         {
