@@ -45,7 +45,7 @@ namespace Telegram.WebAPI.Application
                 var user = _unitOfWork.TelegramUsers.AddClient(chatId, out isNewCliente, $"{e.Message.Chat.FirstName} {e.Message.Chat.LastName}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
-                var userLastReminder = user.Reminders?.FirstOrDefault();
+                var userLastReminder = user.Reminders?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
 
                 string messageReceived = Functions.Generic.RemoveAccents(e.Message.Text.ToLower());
                 if (messageReceived == "ola" || messageReceived == "/start")

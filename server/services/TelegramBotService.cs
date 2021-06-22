@@ -89,10 +89,8 @@ namespace Telegram.WebAPI.services
                 //Esta Task é apenas para o service ficar rodando como HostedService
                 do
                 {
-                    _logger.LogInformation("Entrou no loop");
                     foreach (var mensagem in mensagensNaFila.Where(m => m.Processada.Equals(false)).ToList())
                     {
-                        _logger.LogInformation("Processando mensagens recebidas");
                         await _telegramBotApplication.PrepareQuestionnaires(mensagem.message);
                         mensagem.Processada = true;
                     }
@@ -110,25 +108,20 @@ namespace Telegram.WebAPI.services
 
                     if (telegramBotRunning)
                     {
-                        Settings.SendingMessageStart();
-
                         if (reminderNextSend < DateTime.Now)
                         {
                             await _reminderApplication.SendReminders();
                             reminderNextSend = DateTime.Now.AddMinutes(1);
+                            await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "Checando mensagens", DateTime.Now), false);
                         }
-                        if(riverLevelNextSend< DateTime.Now)
+                        if (riverLevelNextSend< DateTime.Now)
                         {
                             await _riverLevelApp.SendRiverLevel();
                             riverLevelNextSend = DateTime.Now.AddMinutes(3);
                         }
-                        await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "checando mensagens", DateTime.Now), false);
-                        Settings.SendingMessageStop();
-                    }
+                     }
 
                     await Task.Delay(500, stoppingToken);
-
-                    _logger.LogInformation("Finalizou loop");
                 }
                 while (!stoppingToken.IsCancellationRequested);
             }
@@ -147,29 +140,13 @@ namespace Telegram.WebAPI.services
 
         private void botMessageReceiver(object sender, MessageEventArgs e)
         {
-
+            //Adiciona mensagem na lista de mensagens recebidas ao receber uma mensagem.
+            //Esta lista é processada em outra task, que responserá a mensagem.
+            //É feito desta forma para tornar o acesso ao banco thread safe
             mensagensNaFila.Add(new tempMessages { Processada = false, message = e});
 
+            //Remove da fila as mensagens que já foram respondidadas
             mensagensNaFila.RemoveAll(m => m.Processada.Equals(true));
-
-            //Thread.Sleep(1000);
-            //while (Settings.TelegramBotSendingMessages || Settings.TelegramBotReceivingMessage)
-            //{
-            //    Thread.Sleep(1000);
-            //}
-
-            //Settings.ReceivingMessageStart();
-            //if (e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text)
-            //{
-            //    while (recebendoMensagem)
-            //    {
-            //        Thread.Sleep(1000);
-            //    }
-            //    recebendoMensagem = true;
-            //    _telegramBotApplication.PrepareQuestionnaires(e);
-            //}
-            //Settings.ReceivingMessageStop();
-            //recebendoMensagem = false;
         }
         private void startReceiving()
         {
