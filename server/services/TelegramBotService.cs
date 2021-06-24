@@ -127,8 +127,6 @@ namespace Telegram.WebAPI.services
                     }
 
                     await Task.Delay(500, stoppingToken);
-
-                    _logger.LogInformation("Finalizou loop");
                 }
                 while (!stoppingToken.IsCancellationRequested);
             }
