@@ -70,7 +70,8 @@ Comece enviando '/start' ou 'Olá' e o bot responderá com os comandos disponív
 - [x] Monitorar o site do AlertaBlu e identificar mudanças no nível do rio
 - [x] Ter uma página para visualizar as mensagens enviadas/recebidas
 - [x] Enviar as mensagens enviadas/recebidas para o frontend ativamente com SinglaR
-- [ ] Criar vários lembretes para um usuário
+- [x] Criar vários lembretes para um usuário
+- [ ] Conseguir excluir apenas um lembrete. Atualmente são excluídos todos lembretes
 
 ---
 
