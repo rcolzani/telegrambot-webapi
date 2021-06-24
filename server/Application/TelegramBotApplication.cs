@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.WebAPI.Data.Memory;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Hubs;
@@ -227,7 +226,7 @@ namespace Telegram.WebAPI.Application
             {
                 string remindersConcat = "";
 
-                var reminders = _unitOfWork.Reminders.GetAllRemindersByUser(user.Id);
+                var reminders = _unitOfWork.Reminders.GetAllRemindersActiveByUser(user.Id);
 
                 foreach (var reminder in reminders)
                 {

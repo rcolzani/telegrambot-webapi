@@ -70,7 +70,8 @@ Comece enviando '/start' ou 'Olá' e o bot responderá com os comandos disponív
 - [x] Monitorar o site do AlertaBlu e identificar mudanças no nível do rio
 - [x] Ter uma página para visualizar as mensagens enviadas/recebidas
 - [x] Enviar as mensagens enviadas/recebidas para o frontend ativamente com SinglaR
-- [ ] Criar vários lembretes para um usuário
+- [x] Criar vários lembretes para um usuário
+- [ ] Conseguir excluir apenas um lembrete. Atualmente são excluídos todos lembretes
 
 ---
 
@@ -93,11 +94,18 @@ Comece enviando '/start' ou 'Olá' e o bot responderá com os comandos disponív
 - <a href="https://core.telegram.org/bots/api">Telegram Bot API</a>
 - <a href="https://github.com/TelegramBots/Telegram.Bot">.NET Client for Telegram Bot API</a>
 - SignalR
+- <a href="https://sentry.io">Sentry</a>
 
 ##### Frontend
 
 - <a href="https://reactjs.org"> ReactJS </a>
 - <a href="https://styled-components.com/">Styled Components </a>
+
+##### Publicação
+
+-  <a href="https://www.netlify.com/">Netlify</a> - para publicação do frontend em react.
+-  <a href="https://heroku.com/">Heroku</a> - para publicação do backend. Foi utilizado geração com docker-compose e hospedado no heroku.
+-  <a href="https://www.jawsdb.com/">JawsDB</a> - para banco de dados as a service. 
 
 ---
 

@@ -20,6 +20,13 @@ namespace Telegram.WebAPI.Domain.Repositories
             return dados.ToList();
         }
 
+        public List<Reminder> GetAllRemindersActiveByUser(int userId)
+        {
+            var dados = _context.Reminder.Where(r => r.TelegramUserId.Equals(userId) && r.Status.Equals(ReminderStatus.Activated)).OrderByDescending(u => u.CreatedAt);
+
+            return dados.ToList();
+        }
+
         public List<Reminder> GetAllRemindersByUser(int userId)
         {
             var dados = _context.Reminder.Where(r => r.TelegramUserId.Equals(userId)).OrderByDescending(u => u.CreatedAt);
