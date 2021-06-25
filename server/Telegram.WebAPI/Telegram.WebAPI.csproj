@@ -18,5 +18,8 @@
  <ItemGroup>
    <Folder Include="Shared\" />
  </ItemGroup>
+ <ItemGroup>
+   <ProjectReference Include="..\Telegram.WebAPI.Shared\Telegram.WebAPI.Shared.csproj" />
+ </ItemGroup>
 
 </Project>

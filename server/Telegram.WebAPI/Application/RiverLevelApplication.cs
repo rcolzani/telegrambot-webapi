@@ -10,6 +10,7 @@ using Telegram.Bot;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
+using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.Application
 {
@@ -54,7 +55,7 @@ namespace Telegram.WebAPI.Application
             }
             catch (Exception e)
             {
-                Functions.Generic.LogException(e);
+                e.LogExceptionToConsole();
                 return false;
             }
         }
@@ -88,7 +89,7 @@ namespace Telegram.WebAPI.Application
             }
             catch (Exception e)
             {
-                Functions.Generic.LogException(e);
+                e.LogExceptionToConsole();
             }
 
         }

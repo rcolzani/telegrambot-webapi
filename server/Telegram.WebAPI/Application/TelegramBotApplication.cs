@@ -14,6 +14,7 @@ using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Hubs.Models;
+using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.Application
 {
@@ -46,7 +47,8 @@ namespace Telegram.WebAPI.Application
 
                 var userLastReminder = user.Reminders?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
 
-                string messageReceived = Functions.Generic.RemoveAccents(e.Message.Text.ToLower());
+                string messageReceived = e.Message.Text.ToLower().RemoveAccents();
+
                 if (messageReceived == "ola" || messageReceived == "/start")
                 {
                     ReceivedMessageHello(user, isNewCliente);

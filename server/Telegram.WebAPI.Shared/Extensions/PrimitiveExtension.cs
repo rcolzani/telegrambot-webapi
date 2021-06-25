@@ -1,20 +1,12 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Functions
+namespace Telegram.WebAPI.Shared.Extensions
 {
-    static class Generic
+    public static class PrimitiveExtension
     {
-        public static void LogEvent(string LcTexto)
-        {
-            Console.WriteLine($"{System.DateTime.Now} - {LcTexto}");
-        }
-        public static void LogException(Exception e)
-        {
-            Console.WriteLine($"{e.GetType().Name}: {e.Message}");
-        }
-
         public static string RemoveAccents(this string text)
         {
             StringBuilder sbReturn = new StringBuilder();

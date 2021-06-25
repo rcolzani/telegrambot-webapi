@@ -20,6 +20,7 @@ using Telegram.WebAPI.Application;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.services
 {
@@ -127,7 +128,7 @@ namespace Telegram.WebAPI.services
             }
             catch (Exception ex)
             {
-                Functions.Generic.LogException(ex);
+                ex.LogExceptionToConsole();
                 _logger.LogError(ex.ToString());
                 throw;
             }
