@@ -42,7 +42,7 @@ namespace Telegram.WebAPI.Application
 
 
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
-                var user = _unitOfWork.TelegramUsers.AddClient(chatId, out isNewCliente, $"{e.Message.Chat.FirstName} {e.Message.Chat.LastName}".Trim());
+                var user = _unitOfWork.TelegramUsers.AddClient(chatId, out isNewCliente, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
                 var userLastReminder = user.Reminders?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
@@ -133,26 +133,7 @@ namespace Telegram.WebAPI.Application
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
-        public async Task<bool> sendMessageAsync(long telegramClientId, string text, IReplyMarkup replyMarkup = null)
-        {
-            try
-            {
-                if (text == null)
-                    return false;
 
-                if (replyMarkup == null)
-                    replyMarkup = new ReplyKeyboardRemove() { };
-
-                var messageSent = await bot.SendTextMessageAsync(telegramClientId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
-                await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Sistema", text, DateTime.Now), false);
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"{DateTime.Now} : {e.ToString()}");
-                return false;
-            }
-        }
         private async void ReceivedMessageReminder(TelegramUser user)
         {
             try
@@ -309,7 +290,7 @@ namespace Telegram.WebAPI.Application
                     $"*Parar* - para não receber mais lembretes e alertas sobre o nível do rio{Environment.NewLine}" +
                     "*Sair* - para sair do menu";
 
-                await sendMessageAsync(user.TelegramChatId, texto, keyboard);
+                await sendMessageAndHideUserAsync(user.TelegramChatId, texto, user.Name,keyboard );
             }
             catch (Exception ex)
             {
@@ -347,7 +328,38 @@ namespace Telegram.WebAPI.Application
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
+        public async Task<bool> sendMessageAndHideUserAsync(long telegramClientId, string text, string userNameToHide,IReplyMarkup replyMarkup = null)
+        {
+            return await _sendMessageAsync(telegramClientId, text, replyMarkup, userNameToHide);
+        }
+        public async Task<bool> sendMessageAsync(long telegramClientId, string text, IReplyMarkup replyMarkup = null)
+        {
+            return await _sendMessageAsync(telegramClientId, text, replyMarkup);
+        }
+        private async Task<bool> _sendMessageAsync(long telegramClientId, string text, IReplyMarkup replyMarkup = null, string userNameToHide = "")
+        {
+            try
+            {
+                if (text == null) { return false; }
 
+                if (replyMarkup == null) { replyMarkup = new ReplyKeyboardRemove() { }; }
+
+                var messageSent = await bot.SendTextMessageAsync(telegramClientId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
+
+                if (string.IsNullOrWhiteSpace(userNameToHide) == false)
+                {
+                    text = text.Replace(userNameToHide, "[nome do usuário]");
+                }
+
+                await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Sistema", text, DateTime.Now), false);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"{DateTime.Now} : {e.ToString()}");
+                return false;
+            }
+        }
         private async Task HubSendMessage(ChatMessage chatMessage, bool limitUsername)
         {
             try
@@ -357,6 +369,7 @@ namespace Telegram.WebAPI.Application
                     //Limitar o nome do usuário em 2 caracteres para não expor o nome completo
                     chatMessage.User = chatMessage.User.Substring(0, 2);
                 }
+
                 await _chatHub.Clients.All.ReceiveMessage(chatMessage);
             }
             catch (Exception ex)

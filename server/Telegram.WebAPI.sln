@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI", "Telegram.WebAPI\Telegram.WebAPI.csproj", "{9452686B-5CD4-4E26-9C71-15C65D83D60A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI.Shared", "Telegram.WebAPI.Shared\Telegram.WebAPI.Shared.csproj", "{3B071C4E-20A3-49B9-B42F-7DEF1A43FF98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI.Domain", "Telegram.WebAPI.Domain\Telegram.WebAPI.Domain.csproj", "{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{938EC75E-CD16-4B59-9426-83AD848C76DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI.Application", "Telegram.WebAPI.Application\Telegram.WebAPI.Application.csproj", "{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI", "Telegram.WebAPI\Telegram.WebAPI.csproj", "{9452686B-5CD4-4E26-9C71-15C65D83D60A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}.Release|Any CPU.Build.0 = Release|Any CPU
-		{938EC75E-CD16-4B59-9426-83AD848C76DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{938EC75E-CD16-4B59-9426-83AD848C76DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{938EC75E-CD16-4B59-9426-83AD848C76DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{938EC75E-CD16-4B59-9426-83AD848C76DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

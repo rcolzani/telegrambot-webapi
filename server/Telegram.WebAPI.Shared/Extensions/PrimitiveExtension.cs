@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace Telegram.WebAPI.Shared.Extensions
@@ -17,6 +18,14 @@ namespace Telegram.WebAPI.Shared.Extensions
                     sbReturn.Append(letter);
             }
             return sbReturn.ToString();
+        }
+        public static string FirstCharToUpper(this string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return input;
+            }
+            return input.First().ToString().ToUpper() + input.Substring(1);
         }
     }
 }
