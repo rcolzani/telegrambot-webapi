@@ -48,7 +48,7 @@ namespace Telegram.WebAPI.Controllers
         {
             try
             {
-                var clients = await _unitOfWork.TelegramUsers.GetAllClientesAsync();
+                var clients = await _unitOfWork.TelegramUsers.GetAllUsersAsync();
                 var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync();
 
                 var activeClientsQuantity = clients.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >= 1).Count();

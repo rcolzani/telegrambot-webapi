@@ -9,13 +9,13 @@ namespace Telegram.WebAPI.Domain.Interfaces
 {
     public interface ITelegramUserRepository: IRepository<TelegramUser>
     {
-        TelegramUser AddClient(int chatId, out bool isNewClient, string name);
-        Task<TelegramUser> GetClienteAsync(int id, bool asNoTracking = false);
-        TelegramUser GetCliente(int id, bool asNoTracking = false);
-        Task<TelegramUser> GetClienteByTelegramIdAsync(long id, bool asNoTracking = false);
-        TelegramUser GetClienteByTelegramId(long id, bool asNoTracking = false);
-        Task<TelegramUser[]> GetAllClientesAsync();
-        TelegramUser[] GetAllClientes();
+        TelegramUser AddUser(int chatId, out bool isNewClient, string name);
+        Task<TelegramUser> GetUserByIdAsync(int id, bool asNoTracking = false);
+        TelegramUser GetUserById(int id, bool asNoTracking = false);
+        Task<TelegramUser> GetUserByTelegramIdAsync(long id, bool asNoTracking = false);
+        TelegramUser GetUserByTelegramId(long id, bool asNoTracking = false);
+        Task<TelegramUser[]> GetAllUsersAsync();
+        TelegramUser[] GetAllUsers();
         List<TelegramUser> GetAllUsersWithSendRiverActivate();
         List<TelegramUser> GetAllUsersWithReminderActivate();
     }

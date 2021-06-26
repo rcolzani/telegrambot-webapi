@@ -36,13 +36,13 @@ namespace Telegram.WebAPI.Application
             try
             {
                 int chatId = (int)e.Message.Chat.Id;
-                bool isNewCliente = false;
+                bool isNewUser = false;
 
                 // if (UserTemp.TempUsers.Where(u => u.TelegramId.Equals(chatId)).FirstOrDefault() )
 
 
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
-                var user = _unitOfWork.TelegramUsers.AddClient(chatId, out isNewCliente, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
+                var user = _unitOfWork.TelegramUsers.AddUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
                 var userLastReminder = user.Reminders?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
@@ -51,7 +51,7 @@ namespace Telegram.WebAPI.Application
 
                 if (messageReceived == "ola" || messageReceived == "/start")
                 {
-                    ReceivedMessageHello(user, isNewCliente);
+                    ReceivedMessageHello(user, isNewUser);
                 }
                 else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTextMessage)
                 {

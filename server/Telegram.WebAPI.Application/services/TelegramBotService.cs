@@ -33,8 +33,6 @@ namespace Telegram.WebAPI.services
         ILogger<TelegramBotService> _logger;
         private TelegramBotClient bot;
 
-        private bool recebendoMensagem = false;
-
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
