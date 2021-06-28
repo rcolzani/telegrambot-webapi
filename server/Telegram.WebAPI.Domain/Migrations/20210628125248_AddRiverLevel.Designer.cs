@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Telegram.WebAPI.Data;
 
 namespace Telegram.WebAPI.Migrations
 {
     [DbContext(typeof(TelegramContext))]
-    partial class TelegramContextModelSnapshot : ModelSnapshot
+    [Migration("20210628125248_AddRiverLevel")]
+    partial class AddRiverLevel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,6 +82,32 @@ namespace Telegram.WebAPI.Migrations
                     b.HasIndex("TelegramUserId");
 
                     b.ToTable("Reminder");
+                });
+
+            modelBuilder.Entity("Telegram.WebAPI.Domain.Entities.RiverLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<double>("Level")
+                        .HasColumnType("double");
+
+                    b.Property<DateTime>("ReadDateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<double>("Variation")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RiverLevel");
                 });
 
             modelBuilder.Entity("Telegram.WebAPI.Domain.Entities.TelegramUser", b =>

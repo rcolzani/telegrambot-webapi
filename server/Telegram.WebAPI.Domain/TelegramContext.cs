@@ -11,6 +11,7 @@ namespace Telegram.WebAPI.Data
         public DbSet<TelegramUser> TelegramUser { get; set; }
         public DbSet<MessageHistory> Messages { get; set; }
         public DbSet<Reminder> Reminder { get; set; }
+        public DbSet<RiverLevel> RiverLevel { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
