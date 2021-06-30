@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Telegram.WebAPI.Application.Services;
 using Telegram.WebAPI.Data;
+using Telegram.WebAPI.Domain.DTO;
 using Telegram.WebAPI.Domain.Interfaces;
-using Telegram.WebAPI.Dtos;
 
 namespace Telegram.WebAPI.Controllers
 {
@@ -14,11 +15,11 @@ namespace Telegram.WebAPI.Controllers
     [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private StatisticsApplication _statisticsApp;
         private readonly ILogger<TelegramBotController> _logger;
-        public TelegramBotController(IUnitOfWork unitOfWork, ILogger<TelegramBotController> logger)
+        public TelegramBotController(IUnitOfWork unitOfWork, ILogger<TelegramBotController> logger, StatisticsApplication statisticsApp)
         {
-            _unitOfWork = unitOfWork;
+            _statisticsApp = statisticsApp;
             _logger = logger;
         }
         [HttpGet]
@@ -48,14 +49,13 @@ namespace Telegram.WebAPI.Controllers
         {
             try
             {
-                var clients = await _unitOfWork.TelegramUsers.GetAllUsersAsync();
-                var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync();
+                var statistics = await _statisticsApp.GetStatistics();
 
-                var activeClientsQuantity = clients.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >= 1).Count();
-                var messageReceivedQuantity = messages.Where(m => m.MessageSent == false).Count();
-                var messageSentQuantity = messages.Where(m => m.MessageSent).Count();
+                var quantity = new Hubs.Models.StatisticsMain(statistics.UsersQuantity, 
+                    statistics.ActiveUsersQuantity, 
+                    statistics.MessagesReceivedQuantity, 
+                    statistics.MessagesSentQuantity);
 
-                var quantity = new Hubs.Models.StatisticsMain(clients.Length, activeClientsQuantity, messageReceivedQuantity, messageSentQuantity);
                 return Ok(quantity);
             }
             catch (Exception ex)

@@ -1,4 +1,4 @@
-namespace Telegram.WebAPI.Dtos
+namespace Telegram.WebAPI.Domain.DTO
 {
     public class StatusChangeDto
     {

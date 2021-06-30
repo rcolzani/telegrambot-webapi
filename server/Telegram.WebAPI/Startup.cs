@@ -13,12 +13,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using server.Middlewares;
 using Telegram.WebAPI.Application;
+using Telegram.WebAPI.Application.Services;
 using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Domain;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
-using Telegram.WebAPI.services;
+using Telegram.WebAPI.HostedServices;
 
 namespace Telegram.WebAPI
 {
@@ -54,6 +55,7 @@ namespace Telegram.WebAPI
             services.AddSingleton<TelegramBotApplication>();
             services.AddSingleton<ReminderApplication>();
             services.AddSingleton<RiverLevelApplication>();
+            services.AddSingleton<StatisticsApplication>();
 
             services.AddSingleton<IConfiguration>(Configuration);
 

@@ -1,18 +1,12 @@
-﻿using HtmlAgilityPack;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using Telegram.Bot;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Shared.Extensions;
 
-namespace Telegram.WebAPI.Application
+namespace Telegram.WebAPI.Application.Services
 {
     public class ReminderApplication
     {

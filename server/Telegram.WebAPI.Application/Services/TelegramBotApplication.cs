@@ -16,7 +16,7 @@ using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Hubs.Models;
 using Telegram.WebAPI.Shared.Extensions;
 
-namespace Telegram.WebAPI.Application
+namespace Telegram.WebAPI.Application.Services
 {
     public class TelegramBotApplication
     {

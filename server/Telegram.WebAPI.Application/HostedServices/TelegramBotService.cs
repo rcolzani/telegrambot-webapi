@@ -21,8 +21,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using Telegram.WebAPI.Shared.Extensions;
+using Telegram.WebAPI.Application.Services;
 
-namespace Telegram.WebAPI.services
+namespace Telegram.WebAPI.HostedServices
 {
     /// <summary>
     /// Service responsável por receber mensagens e executar as aplicações de Lembrete (reminder) e nível do rio ()
@@ -40,7 +41,6 @@ namespace Telegram.WebAPI.services
         private TelegramBotApplication _telegramBotApplication;
         private ReminderApplication _reminderApplication;
         private RiverLevelApplication _riverLevelApp;
-
 
         private class tempMessages
         {
@@ -111,7 +111,7 @@ namespace Telegram.WebAPI.services
                         {
                             await _reminderApplication.SendReminders();
                             reminderNextSend = DateTime.Now.AddMinutes(1);
-                            await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server info", "Checando mensagens", DateTime.Now), false);
+                            await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server information", "Checando mensagens", DateTime.Now), false);
                         }
                         if (riverLevelNextSend< DateTime.Now)
                         {

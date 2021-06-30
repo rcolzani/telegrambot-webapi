@@ -41,7 +41,7 @@ namespace Telegram.WebAPI.Domain.Repositories
 
                 return await query.ToArrayAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 
                 throw;

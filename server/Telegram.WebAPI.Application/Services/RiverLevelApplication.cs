@@ -12,7 +12,7 @@ using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Shared.Extensions;
 
-namespace Telegram.WebAPI.Application
+namespace Telegram.WebAPI.Application.Services
 {
     public class RiverLevelApplication
     {
