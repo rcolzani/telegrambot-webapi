@@ -3,8 +3,8 @@ WORKDIR /app
 
 # Copy csproj and restore as distinct layers
 COPY ["Telegram.WebAPI/Telegram.WebAPI.csproj", "Telegram.WebAPI/"] 
-COPY ["Telegram.WebAPI.Infra/Telegram.WebAPI.Infra.csproj",  "Telegram.WebAPI.Infra/"]
 COPY ["Telegram.WebAPI.Shared/Telegram.WebAPI.Shared.csproj",  "Telegram.WebAPI.Shared/"]
+COPY ["Telegram.WebAPI.Data/Telegram.WebAPI.Data.csproj",  "Telegram.WebAPI.Data/"]
 COPY ["Telegram.WebAPI.Domain/Telegram.WebAPI.Domain.csproj",  "Telegram.WebAPI.Domain/"]
 COPY ["Telegram.WebAPI.Application/Telegram.WebAPI.Application.csproj",  "Telegram.WebAPI.Application/"]
 RUN dotnet restore "Telegram.WebAPI/Telegram.WebAPI.csproj"
