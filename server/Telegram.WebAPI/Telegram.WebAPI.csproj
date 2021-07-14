@@ -16,7 +16,6 @@
  <ItemGroup>
    <ProjectReference Include="..\Telegram.WebAPI.Application\Telegram.WebAPI.Application.csproj" />
    <ProjectReference Include="..\Telegram.WebAPI.Domain\Telegram.WebAPI.Domain.csproj" />
-   <ProjectReference Include="..\Telegram.WebAPI.Infra\Telegram.WebAPI.Infra.csproj" />
    <ProjectReference Include="..\Telegram.WebAPI.Shared\Telegram.WebAPI.Shared.csproj" />
  </ItemGroup>
 
