@@ -111,7 +111,7 @@ namespace Telegram.WebAPI.HostedServices
                         {
                             await _reminderApplication.SendReminders();
                             reminderNextSend = DateTime.Now.AddMinutes(1);
-                            await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server information", "Checando mensagens", DateTime.Now), false);
+                            await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server information", "Checando lembretes para enviar", DateTime.Now), false);
                         }
                         if (riverLevelNextSend< DateTime.Now)
                         {

@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI.Shared", "Telegram.WebAPI.Shared\Telegram.WebAPI.Shared.csproj", "{3B071C4E-20A3-49B9-B42F-7DEF1A43FF98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI.Domain", "Telegram.WebAPI.Domain\Telegram.WebAPI.Domain.csproj", "{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3BF43169-078D-4BCD-B6B0-62F72AE63737} = {3BF43169-078D-4BCD-B6B0-62F72AE63737}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI.Application", "Telegram.WebAPI.Application\Telegram.WebAPI.Application.csproj", "{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}"
 EndProject
