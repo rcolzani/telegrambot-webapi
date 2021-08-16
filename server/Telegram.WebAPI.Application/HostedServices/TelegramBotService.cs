@@ -42,13 +42,7 @@ namespace Telegram.WebAPI.HostedServices
         private ReminderApplication _reminderApplication;
         private RiverLevelApplication _riverLevelApp;
 
-        private class tempMessages
-        {
-            public MessageEventArgs message { get; set; }
-            public bool Processada { get; set; }
-        }
-
-        private List<tempMessages> mensagensNaFila;
+        private List<ReceivedMessage> receivedMessagesToProcess;
         public TelegramBotService(IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication, ReminderApplication reminderApplication, RiverLevelApplication riverLevelApp, ILogger<TelegramBotService> logger)
         {
             _logger = logger;
@@ -64,18 +58,15 @@ namespace Telegram.WebAPI.HostedServices
             bot.OnMessage += botMessageReceiver;
             Settings.TelegramBotActivated = true;
 
-            mensagensNaFila = new List<tempMessages>();
+            receivedMessagesToProcess = new List<ReceivedMessage>();
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _executingTask = ExecuteAsync(_stoppingCts.Token);
-            // se a tarefa foi concluida então retorna,
-            // isto causa o cancelamento e a falha do chamados
             if (_executingTask.IsCompleted)
             {
                 return _executingTask;
             }
-            // de outra forma ela esta rodando
             return Task.CompletedTask;
         }
         protected virtual async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -88,10 +79,10 @@ namespace Telegram.WebAPI.HostedServices
                 //Esta Task é apenas para o service ficar rodando como HostedService
                 do
                 {
-                    foreach (var mensagem in mensagensNaFila.Where(m => m.Processada.Equals(false)).ToList())
+                    foreach (var mensagem in receivedMessagesToProcess.Where(m => m.IsProcessed.Equals(false)).ToList())
                     {
-                        await _telegramBotApplication.PrepareQuestionnaires(mensagem.message);
-                        mensagem.Processada = true;
+                        await _telegramBotApplication.PrepareQuestionnaires(mensagem.Message);
+                        mensagem.SetAsProcessed();
                     }
 
                     if (telegramBotRunning && Settings.TelegramBotActivated == false)
@@ -142,10 +133,10 @@ namespace Telegram.WebAPI.HostedServices
             //Adiciona mensagem na lista de mensagens recebidas ao receber uma mensagem.
             //Esta lista é processada em outra task, que responserá a mensagem.
             //É feito desta forma para tornar o acesso ao banco thread safe
-            mensagensNaFila.Add(new tempMessages { Processada = false, message = e});
+            receivedMessagesToProcess.Add(new ReceivedMessage(e));
 
             //Remove da fila as mensagens que já foram respondidadas
-            mensagensNaFila.RemoveAll(m => m.Processada.Equals(true));
+            receivedMessagesToProcess.RemoveAll(m => m.IsProcessed.Equals(true));
         }
         private void startReceiving()
         {
@@ -165,6 +156,22 @@ namespace Telegram.WebAPI.HostedServices
                 chatMessage.User = chatMessage.User.Substring(0, 2);
             }
             await _chatHub.Clients.All.ReceiveMessage(chatMessage);
+        }
+        private class ReceivedMessage
+        {
+            public MessageEventArgs Message { get; private set; }
+            public bool IsProcessed { get; private set; }
+
+            public ReceivedMessage(MessageEventArgs message)
+            {
+                this.Message = message;
+                IsProcessed = false;
+            }
+
+            public void SetAsProcessed()
+            {
+                this.IsProcessed = true;
+            }
         }
     }
 }

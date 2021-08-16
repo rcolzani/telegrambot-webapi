@@ -19,6 +19,9 @@ namespace Telegram.WebAPI.Domain.Entities
 
             this.CreatedAt = DateTime.Now;
             this.UpdatedAt = DateTime.Now;
+
+            this.Reminders = new List<Reminder>();
+            this.MessageHistory = new List<MessageHistory>();
         }
         public long TelegramChatId { get; set; }
         public string Name { get; set; }
@@ -43,6 +46,11 @@ namespace Telegram.WebAPI.Domain.Entities
 
         public void StopReminders()
         {
+            if (Reminders == null)
+            {
+                return;
+            }
+
             foreach (var reminder in Reminders)
             {
                 reminder.StopReminder();

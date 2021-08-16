@@ -6,7 +6,7 @@ namespace Telegram.WebAPI.Hubs.Models
     {
         public ChatMessage(string user, string message, DateTime dataHora)
         {
-            this.User = user;
+            this.User = user.Substring(0, 2); ;
             this.Message = message.Replace(user, "<usuário>");
             this.DataHora = dataHora;
         }

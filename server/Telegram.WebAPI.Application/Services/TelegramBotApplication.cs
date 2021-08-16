@@ -38,9 +38,6 @@ namespace Telegram.WebAPI.Application.Services
                 int chatId = (int)e.Message.Chat.Id;
                 bool isNewUser = false;
 
-                // if (UserTemp.TempUsers.Where(u => u.TelegramId.Equals(chatId)).FirstOrDefault() )
-
-
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
                 var user = _unitOfWork.TelegramUsers.AddUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
@@ -68,10 +65,6 @@ namespace Telegram.WebAPI.Application.Services
                 else if (messageReceived == "lembrete")
                 {
                     ReceivedMessageReminder(user);
-                }
-                else if (messageReceived == "sair")
-                {
-                    ReceivedMessageExitMenu(user);
                 }
                 else if (messageReceived == "nivel do rio")
                 {
@@ -148,18 +141,13 @@ namespace Telegram.WebAPI.Application.Services
                         },
                         new []{
                             new KeyboardButton("Consultar")
-                        },
-                        new[]
-                        {
-                            new KeyboardButton("Sair")
                         }
                     }
                 };
 
                 string texto = $"Selecione uma das opções no teclado que apareceu para você ou digite:{Environment.NewLine}" +
                     $"*Iniciar* - para iniciar o cadastro de um lembrete{Environment.NewLine}" +
-                    $"*Consultar* - para consultar os lembretes ativos{Environment.NewLine}" +
-                    "*Sair* - para sair do menu";
+                    $"*Consultar* - para consultar os lembretes ativos{Environment.NewLine}";
 
                 await sendMessageAsync(user.TelegramChatId, texto, keyboard);
             }
@@ -199,10 +187,6 @@ namespace Telegram.WebAPI.Application.Services
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
-        private async void ReceivedMessageExitMenu(TelegramUser user)
-        {
-            await sendMessageAsync(user.TelegramChatId, $"Você saiu do menu.{Environment.NewLine}{Environment.NewLine}Para voltar a conversar comigo diga Olá");
-        }
         private async void ReceivedMessageConsult(TelegramUser user)
         {
             try
@@ -225,10 +209,6 @@ namespace Telegram.WebAPI.Application.Services
                         new[]
                         {
                             new KeyboardButton("Iniciar")
-                        },
-                        new[]
-                        {
-                            new KeyboardButton("Sair")
                         }
                     }
                     };
@@ -268,10 +248,6 @@ namespace Telegram.WebAPI.Application.Services
                         new[]
                         {
                             new KeyboardButton("Parar")
-                        },
-                        new[]
-                        {
-                            new KeyboardButton("Sair")
                         }
                     }
                 };
@@ -287,8 +263,7 @@ namespace Telegram.WebAPI.Application.Services
                 texto += $"Selecione uma das opções no teclado que apareceu para você ou digite:{Environment.NewLine}" +
                     $"*Lembrete* - para acessar as opções de lembretes{Environment.NewLine}" +
                     $"*Nível do rio* - para saber em tempo real quando uma nova medição foi atualizada no site da defesa civil de Blumenau{Environment.NewLine}" +
-                    $"*Parar* - para não receber mais lembretes e alertas sobre o nível do rio{Environment.NewLine}" +
-                    "*Sair* - para sair do menu";
+                    $"*Parar* - para não receber mais lembretes e alertas sobre o nível do rio{Environment.NewLine}";
 
                 await sendMessageAndHideUserAsync(user.TelegramChatId, texto, user.Name,keyboard );
             }
