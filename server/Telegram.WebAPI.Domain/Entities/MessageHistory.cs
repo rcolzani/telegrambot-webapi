@@ -19,11 +19,11 @@ namespace Telegram.WebAPI.Domain.Entities
             this.MessageDate = messageDate;
             this.MessageSent = messageSent;
         }
-        public string TextMessage { get; set; }
-        public DateTime MessageDate { get; set; }
-        public bool MessageSent { get; set; }
+        public string TextMessage { get; private set; }
+        public DateTime MessageDate { get; private set; }
+        public bool MessageSent { get; private set; }
 
-        public int TelegramUserId { get; set; }
+        public int TelegramUserId { get; private set; }
         public virtual TelegramUser TelegramUser { get; set; }
     }
 }

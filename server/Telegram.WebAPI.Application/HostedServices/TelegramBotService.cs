@@ -22,6 +22,8 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using Telegram.WebAPI.Shared.Extensions;
 using Telegram.WebAPI.Application.Services;
+using Telegram.WebAPI.Application.Hubs.Models;
+using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
 
 namespace Telegram.WebAPI.HostedServices
 {
@@ -88,12 +90,12 @@ namespace Telegram.WebAPI.HostedServices
                     if (telegramBotRunning && Settings.TelegramBotActivated == false)
                     {
                         stopReceiving();
-                        await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi parado.", DateTime.Now), false);
+                        await HubSendMessage(new MessageSystem("Server status", "O server foi parado.", DateTime.Now), false);
                     }
                     else if (telegramBotRunning == false && Settings.TelegramBotActivated)
                     {
                         startReceiving();
-                        await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server status", "O server foi iniciado.", DateTime.Now), false);
+                        await HubSendMessage(new MessageSystem("Server status", "O server foi iniciado.", DateTime.Now), false);
                     }
 
                     if (telegramBotRunning)
@@ -102,7 +104,7 @@ namespace Telegram.WebAPI.HostedServices
                         {
                             await _reminderApplication.SendReminders();
                             reminderNextSend = DateTime.Now.AddMinutes(1);
-                            await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Server information", "Checando lembretes para enviar", DateTime.Now), false);
+                            await HubSendMessage(new MessageSystem("Server information", "Checando lembretes para enviar", DateTime.Now), false);
                         }
                         if (riverLevelNextSend< DateTime.Now)
                         {
@@ -148,7 +150,7 @@ namespace Telegram.WebAPI.HostedServices
             bot.StopReceiving();
             telegramBotRunning = false;
         }
-        private async Task HubSendMessage(ChatMessage chatMessage, bool limitUsername)
+        private async Task HubSendMessage(MessageBase chatMessage, bool limitUsername)
         {
             if (limitUsername && chatMessage.User != null)
             {

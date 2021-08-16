@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.WebAPI.Application.Hubs.Models;
+using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Hubs;
@@ -85,7 +87,7 @@ namespace Telegram.WebAPI.Application.Services
 
                 //O envio de mensagens para o front e a gravação da mensagem recebida devem ser feitas após o processamento da mensagem e envio de resposta ao cliente
                 //assim fica mais rápida a troca de mensagens com o usuário
-                await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage(e.Message.Chat.FirstName, e.Message.Text, e.Message.Date), true);
+                await HubSendMessage(new MessageClient(e.Message.Chat.FirstName, e.Message.Text, e.Message.Date), true);
 
                 //Adiciona mensagem no banco de dados
                 _unitOfWork.MessageHistorys.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.Date, false));
@@ -111,7 +113,6 @@ namespace Telegram.WebAPI.Application.Services
                         return;
                     }
                     reminder.SetTimeToRemind(sendTime);
-                    user.Status = Domain.Enums.TelegramUserStatus.Complete;
                     await sendMessageAsync(user.TelegramChatId, $"Cadastro criado com sucesso!!!{Environment.NewLine}{Environment.NewLine}Você receberá a mensagem: {reminder.TextMessage}{Environment.NewLine}Todos os dias as {reminder.RemindTimeToSend.ToString()}");
                     _unitOfWork.Reminders.Update(reminder);
                     _unitOfWork.TelegramUsers.Update(user);
@@ -326,7 +327,7 @@ namespace Telegram.WebAPI.Application.Services
                     text = text.Replace(userNameToHide, "[nome do usuário]");
                 }
 
-                await HubSendMessage(new Telegram.WebAPI.Hubs.Models.ChatMessage("Sistema", text, DateTime.Now), false);
+                await HubSendMessage(new MessageSystem("Sistema", text, DateTime.Now), false);
                 return true;
             }
             catch (Exception e)
@@ -335,7 +336,7 @@ namespace Telegram.WebAPI.Application.Services
                 return false;
             }
         }
-        private async Task HubSendMessage(ChatMessage chatMessage, bool limitUsername)
+        private async Task HubSendMessage(MessageBase chatMessage, bool limitUsername)
         {
             try
             {

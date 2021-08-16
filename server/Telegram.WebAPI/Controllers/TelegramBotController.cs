@@ -51,9 +51,9 @@ namespace Telegram.WebAPI.Controllers
             {
                 var statistics = await _statisticsApp.GetStatistics();
 
-                var quantity = new Hubs.Models.StatisticsMain(statistics.UsersQuantity, 
-                    statistics.ActiveUsersQuantity, 
-                    statistics.MessagesReceivedQuantity, 
+                var quantity = new StatisticsDto(statistics.ActiveUsersQuantity,
+                    statistics.UsersQuantity,
+                    statistics.MessagesReceivedQuantity,
                     statistics.MessagesSentQuantity);
 
                 return Ok(quantity);

@@ -13,7 +13,6 @@ namespace Telegram.WebAPI.Domain.Entities
         public TelegramUser(long telegramChatId, TelegramUserStatus status, string name)
         {
             this.TelegramChatId = telegramChatId;
-            this.Status = status;
             this.SendRiverLevel = false;
             this.Name = name;
 
@@ -23,10 +22,9 @@ namespace Telegram.WebAPI.Domain.Entities
             this.Reminders = new List<Reminder>();
             this.MessageHistory = new List<MessageHistory>();
         }
-        public long TelegramChatId { get; set; }
-        public string Name { get; set; }
-        public TelegramUserStatus Status { get; set; }
-        public bool SendRiverLevel { get; set; }
+        public long TelegramChatId { get; private set; }
+        public string Name { get; private set; }
+        public bool SendRiverLevel { get; private set; }
 
         public List<Reminder> Reminders { get; set; }
         public List<MessageHistory> MessageHistory { get; set; }
@@ -57,7 +55,6 @@ namespace Telegram.WebAPI.Domain.Entities
             }
 
             this.SendRiverLevel = false;
-            this.Status = Domain.Enums.TelegramUserStatus.NewCliente;
             this.UpdatedAt = DateTime.Now;
         }
     }

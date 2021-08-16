@@ -27,7 +27,7 @@ namespace Telegram.WebAPI.Application.Services
             var messageReceivedQuantity = messages.Where(m => m.MessageSent == false).Count();
             var messageSentQuantity = messages.Where(m => m.MessageSent).Count();
 
-            return new StatisticsDto {ActiveUsersQuantity = activeClientsQuantity, MessagesReceivedQuantity =messageReceivedQuantity, MessagesSentQuantity = messageSentQuantity, UsersQuantity = userQuantity };
+            return new StatisticsDto(activeClientsQuantity, userQuantity, messageReceivedQuantity, messageSentQuantity);
         }
     }
 }

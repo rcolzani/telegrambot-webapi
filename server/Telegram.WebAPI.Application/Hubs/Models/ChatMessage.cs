@@ -2,9 +2,9 @@ using System;
 
 namespace Telegram.WebAPI.Hubs.Models
 {
-    public class ChatMessage
+    public class XChatMessage
     {
-        public ChatMessage(string user, string message, DateTime dataHora)
+        public XChatMessage(string user, string message, DateTime dataHora)
         {
             this.User = user.Substring(0, 2); ;
             this.Message = message.Replace(user, "<usuário>");
