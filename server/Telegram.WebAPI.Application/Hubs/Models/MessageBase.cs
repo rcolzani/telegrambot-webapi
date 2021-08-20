@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Telegram.WebAPI.Application.Hubs.Models.Interfaces
 {
-    public class MessageBase
+    public abstract class MessageBase
     {
         public string User { get; set; }
 

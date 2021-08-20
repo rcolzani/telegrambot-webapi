@@ -1,10 +1,7 @@
-﻿using Functions;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -15,7 +12,6 @@ using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
-using Telegram.WebAPI.Hubs.Models;
 using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.Application.Services
