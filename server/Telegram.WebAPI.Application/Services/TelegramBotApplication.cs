@@ -13,6 +13,7 @@ using Telegram.WebAPI.Application.Hubs.Models;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Hubs.Models;
@@ -23,14 +24,15 @@ namespace Telegram.WebAPI.Application.Services
     public class TelegramBotApplication
     {
         public TelegramBotClient bot;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserRepository _userRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
         ILogger<TelegramBotApplication> _logger;
+        private readonly ITelegramUserRepository _movieRepository;
 
-        public TelegramBotApplication(IUnitOfWork unitOfWork, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger)
+        public TelegramBotApplication(UserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger)
         {
             _chatHub = chatHub;
-            _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
             _logger = logger;
         }
         public async Task<bool> PrepareQuestionnaires(MessageEventArgs e)
@@ -41,10 +43,10 @@ namespace Telegram.WebAPI.Application.Services
                 bool isNewUser = false;
 
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
-                var user = _unitOfWork.TelegramUsers.AddUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
+                var user = _userRepository.AddUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
-                var userLastReminder = user.Reminders?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
+                var userLastReminder = user.GetLastCreatedReminder();
 
                 string messageReceived = e.Message.Text.ToLower().RemoveAccents();
 
@@ -90,8 +92,8 @@ namespace Telegram.WebAPI.Application.Services
                 await HubSendMessage(new MessageClient(e.Message.Chat.FirstName, e.Message.Text, e.Message.Date), true);
 
                 //Adiciona mensagem no banco de dados
-                _unitOfWork.MessageHistorys.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.Date, false));
-                _unitOfWork.Complete();
+                //_unitOfWork.MessageHistorys.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.Date, false));
+                //_unitOfWork.Complete();
                 return true;
             }
             catch (Exception ex)
@@ -100,7 +102,7 @@ namespace Telegram.WebAPI.Application.Services
                 return false;
             }
         }
-        private async void ReceivedMessageReminderTime(TelegramUser user, Reminder reminder, string messageReceived)
+        private async void ReceivedMessageReminderTime(User user, Reminder reminder, string messageReceived)
         {
             try
             {
@@ -112,10 +114,9 @@ namespace Telegram.WebAPI.Application.Services
                         await sendMessageAsync(user.TelegramChatId, $"Cadastro falhou. Inicie novamente.");
                         return;
                     }
-                    reminder.SetTimeToRemind(sendTime);
+                    user.GetLastCreatedReminder().SetTimeToRemind(sendTime);
                     await sendMessageAsync(user.TelegramChatId, $"Cadastro criado com sucesso!!!{Environment.NewLine}{Environment.NewLine}Você receberá a mensagem: {reminder.TextMessage}{Environment.NewLine}Todos os dias as {reminder.RemindTimeToSend.ToString()}");
-                    _unitOfWork.Reminders.Update(reminder);
-                    _unitOfWork.TelegramUsers.Update(user);
+                    _userRepository.UpdateUser(user);
                 }
                 else
                 {
@@ -128,7 +129,7 @@ namespace Telegram.WebAPI.Application.Services
             }
         }
 
-        private async void ReceivedMessageReminder(TelegramUser user)
+        private async void ReceivedMessageReminder(User user)
         {
             try
             {
@@ -157,16 +158,16 @@ namespace Telegram.WebAPI.Application.Services
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
-        private async void ReceivedMessageReminderText(TelegramUser user, Reminder reminder, string reminderTextMessage)
+        private async void ReceivedMessageReminderText(User user, Reminder reminder, string reminderTextMessage)
         {
             try
             {
-                if (reminderTextMessage == null)
+                if (reminderTextMessage == null) 
                     return;
 
                 await sendMessageAsync(user.TelegramChatId, "Qual horário você deseja ser lembrado? Precisa ser no formato HH:MM!");
-                reminder.AddReminderText(reminderTextMessage);
-                _unitOfWork.Reminders.Update(reminder);
+                user.GetLastCreatedReminder().AddReminderText(reminderTextMessage);
+                _userRepository.UpdateUser(user);
             }
             catch (Exception ex)
             {
@@ -174,29 +175,33 @@ namespace Telegram.WebAPI.Application.Services
             }
 
         }
-        private async void ReceivedMessageStopReceiver(TelegramUser user)
+        private async void ReceivedMessageStopReceiver(User user)
         {
             try
             {
-                user.StopReminders();
                 await sendMessageAsync(user.TelegramChatId, "Removido da fila de envio. Para voltar a receber lembretes ou alertas do nível do rio, envie Olá para iniciar o cadastro.");
-                _unitOfWork.TelegramUsers.Update(user);
-                //_unitOfWork.Complete();
+                user.StopReminders();
+                _userRepository.UpdateUser(user);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
-        private async void ReceivedMessageConsult(TelegramUser user)
+        private async void ReceivedMessageConsult(User user)
         {
             try
             {
                 string remindersConcat = "";
 
-                var reminders = _unitOfWork.Reminders.GetAllRemindersActiveByUser(user.Id);
+                var userWithReminders = _userRepository.GetAllRemindersActiveByUser(user.Id);
 
-                foreach (var reminder in reminders)
+                if(userWithReminders == null)
+                {
+                    return;
+                }
+
+                foreach (var reminder in userWithReminders?.GetActiveReminders())
                 {
                     remindersConcat += $"{reminder.TextMessage} às {reminder.RemindTimeToSend}\n\n";
 
@@ -227,11 +232,11 @@ namespace Telegram.WebAPI.Application.Services
             }
 
         }
-        private async void ReceivedMessageCommandNotUnderstand(TelegramUser user)
+        private async void ReceivedMessageCommandNotUnderstand(User user)
         {
             await sendMessageAsync(user.TelegramChatId, $"Não consegui entender este comando :/ Os comandos disponíveis são:{Environment.NewLine}olá - para iniciar a conversa{Environment.NewLine}iniciar - para iniciar o cadastro de um lembrete{Environment.NewLine}parar - para parar o recebimento de lembretes");
         }
-        private async void ReceivedMessageHello(TelegramUser user, bool isNewCliente)
+        private async void ReceivedMessageHello(User user, bool isNewCliente)
         {
             try
             {
@@ -274,15 +279,13 @@ namespace Telegram.WebAPI.Application.Services
             }
 
         }
-        private async void ReceivedMessageStart(TelegramUser user)
+        private async void ReceivedMessageStart(User user)
         {
             try
             {
                 await sendMessageAsync(user.TelegramChatId, "Qual mensagem você deseja receber ao ser lembrado?");
-
-                var reminder = new Reminder(user.Id, "");
-                _unitOfWork.Reminders.Add(reminder);
-                //_unitOfWork.Complete();
+                user.Reminders.Add(new Reminder(""));
+                _userRepository.UpdateUser(user);
             }
             catch (Exception ex)
             {
@@ -291,13 +294,13 @@ namespace Telegram.WebAPI.Application.Services
             }
 
         }
-        private async void ReveivedMessageRiverLevel(TelegramUser user)
+        private async void ReveivedMessageRiverLevel(User user)
         {
             try
             {
                 await sendMessageAsync(user.TelegramChatId, "Feito!\n\nVocê começará a receber as medições do nível do rio a partir de agora.");
                 user.StartReceiveRiverLevel();
-                _unitOfWork.TelegramUsers.Update(user);
+                _userRepository.UpdateUser(user);
             }
             catch (Exception ex)
             {

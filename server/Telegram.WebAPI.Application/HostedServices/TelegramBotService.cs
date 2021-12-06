@@ -42,10 +42,10 @@ namespace Telegram.WebAPI.HostedServices
         private bool telegramBotRunning = false;
         private TelegramBotApplication _telegramBotApplication;
         private ReminderApplication _reminderApplication;
-        private RiverLevelApplication _riverLevelApp;
+        //private RiverLevelApplication _riverLevelApp;
 
         private List<ReceivedMessage> receivedMessagesToProcess;
-        public TelegramBotService(IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication, ReminderApplication reminderApplication, RiverLevelApplication riverLevelApp, ILogger<TelegramBotService> logger)
+        public TelegramBotService(IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication, ReminderApplication reminderApplication,  ILogger<TelegramBotService> logger)
         {
             _logger = logger;
             _chatHub = chatHub;
@@ -54,7 +54,7 @@ namespace Telegram.WebAPI.HostedServices
             _telegramBotApplication.bot = new TelegramBotClient(_token);
 
             _reminderApplication = reminderApplication;
-            _riverLevelApp = riverLevelApp;
+            //_riverLevelApp = riverLevelApp;
 
             bot = new TelegramBotClient(_token);
             bot.OnMessage += botMessageReceiver;
@@ -108,7 +108,7 @@ namespace Telegram.WebAPI.HostedServices
                         }
                         if (riverLevelNextSend< DateTime.Now)
                         {
-                            await _riverLevelApp.SendRiverLevel();
+                            //await _riverLevelApp.SendRiverLevel();
                             riverLevelNextSend = DateTime.Now.AddMinutes(3);
                         }
                      }
@@ -132,13 +132,15 @@ namespace Telegram.WebAPI.HostedServices
 
         private void botMessageReceiver(object sender, MessageEventArgs e)
         {
+            var teste = _telegramBotApplication.PrepareQuestionnaires(e).Result;
+
             //Adiciona mensagem na lista de mensagens recebidas ao receber uma mensagem.
             //Esta lista é processada em outra task, que responserá a mensagem.
             //É feito desta forma para tornar o acesso ao banco thread safe
-            receivedMessagesToProcess.Add(new ReceivedMessage(e));
+            //receivedMessagesToProcess.Add(new ReceivedMessage(e));
 
             //Remove da fila as mensagens que já foram respondidadas
-            receivedMessagesToProcess.RemoveAll(m => m.IsProcessed.Equals(true));
+            //receivedMessagesToProcess.RemoveAll(m => m.IsProcessed.Equals(true));
         }
         private void startReceiving()
         {

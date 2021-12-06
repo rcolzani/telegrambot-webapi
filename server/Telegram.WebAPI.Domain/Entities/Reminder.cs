@@ -6,13 +6,12 @@ using Telegram.WebAPI.Domain.Enums;
 
 namespace Telegram.WebAPI.Domain.Entities
 {
-    public class Reminder : Entity
+    public class Reminder
     {
         public Reminder() { }
-        public Reminder(int userId, string textMessage)
+        public Reminder(string textMessage)
         {
             this.TextMessage = textMessage;
-            this.TelegramUserId = userId;
             this.Status = ReminderStatus.WaitingForTextMessage;
             this.CreatedAt = DateTime.Now;
         }
@@ -26,8 +25,9 @@ namespace Telegram.WebAPI.Domain.Entities
         public DateTime RemindedAt { get; private set; }
         public ReminderStatus Status { get; private set; }
 
-        public int TelegramUserId { get; private set; }
-        public virtual TelegramUser TelegramUser { get; set; }
+        public DateTime CreatedAt { get; protected set; }
+        public DateTime UpdatedAt { get; protected set; }
+
 
         public void SetReminded()
         {

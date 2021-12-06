@@ -37,11 +37,12 @@ namespace Telegram.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TelegramContext>(
-                           context => context.UseMySql(Configuration.GetConnectionString("JawsDB")), ServiceLifetime.Singleton);
+            services.RegisterMongoDbRepositories();
 
             Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
             Functions.Settings.ControllerActionsPassword = Configuration["ControllerActionsPassword"];
+            Functions.Settings.DatabaseName = "telegrambotreminder";
+
 
             services.AddControllers().AddNewtonsoftJson(options =>
              options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -50,11 +51,11 @@ namespace Telegram.WebAPI
 
             services.AddSignalR();
 
-            services.AddSingleton<IUnitOfWork, UnitOfWork>();
+            //services.AddSingleton<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<TelegramBotApplication>();
             services.AddSingleton<ReminderApplication>();
-            services.AddSingleton<RiverLevelApplication>();
+           // services.AddSingleton<RiverLevelApplication>();
             services.AddSingleton<StatisticsApplication>();
 
             services.AddSingleton<IConfiguration>(Configuration);

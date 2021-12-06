@@ -8,6 +8,7 @@ namespace Functions
         public static string TelegramToken { get; set; }
         public static bool TelegramBotActivated { get; set; }
         public static string ControllerActionsPassword { get; set; }
+        public static string DatabaseName { get; set; }
 
     }
 }

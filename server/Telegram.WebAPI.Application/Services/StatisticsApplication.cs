@@ -5,27 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.DTO;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Repositories;
 
 namespace Telegram.WebAPI.Application.Services
 {
     public class StatisticsApplication
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserRepository _userRepository;
 
-        public StatisticsApplication(IUnitOfWork unitOfWork)
+        public StatisticsApplication(UserRepository userRepository)
         {
-            _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
         }
 
         public async Task<StatisticsDto> GetStatistics()
         {
-            var users = await _unitOfWork.TelegramUsers.GetAllUsersAsync();
-            var messages = await _unitOfWork.MessageHistorys.GetAllMessagesAsync();
+            var users = await _userRepository.GetAllUsersAsync();
+            //var messages = await _userRepository.GetAllMessagesAsync();
 
-            var userQuantity = users.Length;
+            var userQuantity = users.Count();
             var activeClientsQuantity = users.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >= 1).Count();
-            var messageReceivedQuantity = messages.Where(m => m.MessageSent == false).Count();
-            var messageSentQuantity = messages.Where(m => m.MessageSent).Count();
+            var messageReceivedQuantity = 0;// messages.Where(m => m.MessageSent == false).Count();
+            var messageSentQuantity = 0; // messages.Where(m => m.MessageSent).Count();
 
             return new StatisticsDto(activeClientsQuantity, userQuantity, messageReceivedQuantity, messageSentQuantity);
         }
