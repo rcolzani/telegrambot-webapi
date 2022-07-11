@@ -39,5 +39,9 @@ namespace Telegram.WebAPI.Domain.Repositories
                 throw;
             }
         }
+        public async Task Add(MessageHistory message)
+        {
+            await _messageCollection.InsertOneAsync(message);
+        }
     }
 }

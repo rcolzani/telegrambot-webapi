@@ -25,17 +25,18 @@ namespace Telegram.WebAPI.Application.Services
     {
         public TelegramBotClient bot;
         private readonly UserRepository _userRepository;
+        private readonly MessageHistoryRepository _messageRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
         ILogger<TelegramBotApplication> _logger;
-        private readonly ITelegramUserRepository _movieRepository;
 
-        public TelegramBotApplication(UserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger)
+        public TelegramBotApplication(UserRepository userRepository, MessageHistoryRepository messageRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger)
         {
             _chatHub = chatHub;
             _userRepository = userRepository;
+            _messageRepository = messageRepository;
             _logger = logger;
         }
-        public async Task<bool> PrepareQuestionnaires(MessageEventArgs e)
+        public async Task PrepareQuestionnaires(MessageEventArgs e)
         {
             try
             {
@@ -92,14 +93,14 @@ namespace Telegram.WebAPI.Application.Services
                 await HubSendMessage(new MessageClient(e.Message.Chat.FirstName, e.Message.Text, e.Message.Date), true);
 
                 //Adiciona mensagem no banco de dados
-                //_unitOfWork.MessageHistorys.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.Date, false));
-                //_unitOfWork.Complete();
-                return true;
+                await _messageRepository.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.Date, false));
+
+                //return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
-                return false;
+                //return false;
             }
         }
         private async void ReceivedMessageReminderTime(User user, Reminder reminder, string messageReceived)
@@ -162,7 +163,7 @@ namespace Telegram.WebAPI.Application.Services
         {
             try
             {
-                if (reminderTextMessage == null) 
+                if (reminderTextMessage == null)
                     return;
 
                 await sendMessageAsync(user.TelegramChatId, "Qual horário você deseja ser lembrado? Precisa ser no formato HH:MM!");
@@ -196,7 +197,7 @@ namespace Telegram.WebAPI.Application.Services
 
                 var userWithReminders = _userRepository.GetAllRemindersActiveByUser(user.Id);
 
-                if(userWithReminders == null)
+                if (userWithReminders == null)
                 {
                     return;
                 }
@@ -271,7 +272,7 @@ namespace Telegram.WebAPI.Application.Services
                     $"*Nível do rio* - para saber em tempo real quando uma nova medição foi atualizada no site da defesa civil de Blumenau{Environment.NewLine}" +
                     $"*Parar* - para não receber mais lembretes e alertas sobre o nível do rio{Environment.NewLine}";
 
-                await sendMessageAndHideUserAsync(user.TelegramChatId, texto, user.Name,keyboard );
+                await sendMessageAndHideUserAsync(user.TelegramChatId, texto, user.Name, keyboard);
             }
             catch (Exception ex)
             {
@@ -307,7 +308,7 @@ namespace Telegram.WebAPI.Application.Services
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
-        public async Task<bool> sendMessageAndHideUserAsync(long telegramClientId, string text, string userNameToHide,IReplyMarkup replyMarkup = null)
+        public async Task<bool> sendMessageAndHideUserAsync(long telegramClientId, string text, string userNameToHide, IReplyMarkup replyMarkup = null)
         {
             return await _sendMessageAsync(telegramClientId, text, replyMarkup, userNameToHide);
         }

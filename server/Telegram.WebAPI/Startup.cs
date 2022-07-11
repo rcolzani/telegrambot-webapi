@@ -38,6 +38,8 @@ namespace Telegram.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.RegisterMongoDbRepositories();
+            services.AddDistributedMemoryCache();
+            services.AddMemoryCache();
 
             Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
             Functions.Settings.ControllerActionsPassword = Configuration["ControllerActionsPassword"];
@@ -55,7 +57,7 @@ namespace Telegram.WebAPI
 
             services.AddSingleton<TelegramBotApplication>();
             services.AddSingleton<ReminderApplication>();
-           // services.AddSingleton<RiverLevelApplication>();
+            services.AddSingleton<RiverLevelApplication>();
             services.AddSingleton<StatisticsApplication>();
 
             services.AddSingleton<IConfiguration>(Configuration);

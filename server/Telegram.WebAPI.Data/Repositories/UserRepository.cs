@@ -55,7 +55,7 @@ namespace Telegram.WebAPI.Domain.Repositories
             return result;
         }
 
-        public async Task<User> GetUserByIdAsync(int id, bool asNoTracking = false)
+        public async Task<User> GetUserByIdAsync(Guid id, bool asNoTracking = false)
         {
             return await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
@@ -74,7 +74,7 @@ namespace Telegram.WebAPI.Domain.Repositories
             return res.ToList();
         }
 
-        public User GetAllRemindersActiveByUser(int userId)
+        public User GetAllRemindersActiveByUser(Guid userId)
         {
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId); //.ElemMatch(x => x.Reminders, x => x.Status.Equals(ReminderStatus.Activated));
 

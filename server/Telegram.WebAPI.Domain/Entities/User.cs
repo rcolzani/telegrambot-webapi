@@ -20,8 +20,10 @@ namespace Telegram.WebAPI.Domain.Entities
 
             this.Reminders = new List<Reminder>();
             this.MessageHistory = new List<MessageHistory>();
+
+            this.Id = Guid.NewGuid();
         }
-        public int Id { get; protected set; }
+        public Guid Id { get; protected set; }
         public long TelegramChatId { get; private set; }
         public string Name { get; private set; }
         public bool SendRiverLevel { get; private set; }

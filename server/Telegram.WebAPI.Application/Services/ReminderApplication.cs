@@ -41,12 +41,10 @@ namespace Telegram.WebAPI.Application.Services
                                 await _telegramBotApp.sendMessageAsync(user.TelegramChatId, reminder.TextMessage);
                             }
                             reminder.SetReminded();
-                            //_unitOfWork.Reminders.Update(reminder);
                         }
                     }
+                    _userRepository.UpdateUser(user);
                 }
-                
-                //_unitOfWork.Complete();
                 return true;
             }
             catch (Exception e)
