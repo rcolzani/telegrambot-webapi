@@ -1,29 +1,19 @@
-using System;
-using System.IO;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using HtmlAgilityPack;
+using Functions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
-using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.WebAPI.Data;
-using Telegram.WebAPI.Hubs;
-using Telegram.WebAPI.Hubs.Clients;
-using Telegram.WebAPI.Hubs.Models;
-using Functions;
-using Telegram.WebAPI.Domain.Interfaces;
-using Telegram.WebAPI.Domain.Entities;
-using Telegram.WebAPI.Application;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using Telegram.WebAPI.Shared.Extensions;
-using Telegram.WebAPI.Application.Services;
 using Telegram.WebAPI.Application.Hubs.Models;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
+using Telegram.WebAPI.Application.Services;
+using Telegram.WebAPI.Hubs;
+using Telegram.WebAPI.Hubs.Clients;
+using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.HostedServices
 {
@@ -45,7 +35,12 @@ namespace Telegram.WebAPI.HostedServices
         private RiverLevelApplication _riverLevelApp;
 
         private List<ReceivedMessage> receivedMessagesToProcess;
-        public TelegramBotService(IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication, ReminderApplication reminderApplication, RiverLevelApplication riverLevelApp, ILogger<TelegramBotService> logger)
+        public TelegramBotService(IHubContext<ChatHub,
+            IChatClient> chatHub,
+            TelegramBotApplication telegramBotApplication,
+            ReminderApplication reminderApplication,
+            RiverLevelApplication riverLevelApp,
+            ILogger<TelegramBotService> logger)
         {
             _logger = logger;
             _chatHub = chatHub;
@@ -81,12 +76,6 @@ namespace Telegram.WebAPI.HostedServices
                 //Esta Task é apenas para o service ficar rodando como HostedService
                 do
                 {
-                    foreach (var mensagem in receivedMessagesToProcess.Where(m => m.IsProcessed.Equals(false)).ToList())
-                    {
-                        await _telegramBotApplication.PrepareQuestionnaires(mensagem.Message);
-                        mensagem.SetAsProcessed();
-                    }
-
                     if (telegramBotRunning && Settings.TelegramBotActivated == false)
                     {
                         stopReceiving();
@@ -106,14 +95,14 @@ namespace Telegram.WebAPI.HostedServices
                             reminderNextSend = DateTime.Now.AddMinutes(1);
                             await HubSendMessage(new MessageSystem("Server information", "Checando lembretes para enviar", DateTime.Now), false);
                         }
-                        if (riverLevelNextSend< DateTime.Now)
+                        if (riverLevelNextSend < DateTime.Now)
                         {
                             await _riverLevelApp.SendRiverLevel();
                             riverLevelNextSend = DateTime.Now.AddMinutes(3);
                         }
-                     }
+                    }
 
-                    await Task.Delay(500, stoppingToken);
+                    //await Task.Delay(500, stoppingToken);
                 }
                 while (!stoppingToken.IsCancellationRequested);
             }
@@ -123,22 +112,16 @@ namespace Telegram.WebAPI.HostedServices
                 _logger.LogError(ex.ToString());
                 throw;
             }
-         
+
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
 
-        private void botMessageReceiver(object sender, MessageEventArgs e)
+        private async void botMessageReceiver(object sender, MessageEventArgs e)
         {
-            //Adiciona mensagem na lista de mensagens recebidas ao receber uma mensagem.
-            //Esta lista é processada em outra task, que responserá a mensagem.
-            //É feito desta forma para tornar o acesso ao banco thread safe
-            receivedMessagesToProcess.Add(new ReceivedMessage(e));
-
-            //Remove da fila as mensagens que já foram respondidadas
-            receivedMessagesToProcess.RemoveAll(m => m.IsProcessed.Equals(true));
+            await _telegramBotApplication.PrepareQuestionnaires(e);
         }
         private void startReceiving()
         {

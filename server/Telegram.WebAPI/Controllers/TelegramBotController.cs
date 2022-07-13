@@ -17,7 +17,7 @@ namespace Telegram.WebAPI.Controllers
     {
         private StatisticsApplication _statisticsApp;
         private readonly ILogger<TelegramBotController> _logger;
-        public TelegramBotController(IUnitOfWork unitOfWork, ILogger<TelegramBotController> logger, StatisticsApplication statisticsApp)
+        public TelegramBotController(ILogger<TelegramBotController> logger, StatisticsApplication statisticsApp)
         {
             _statisticsApp = statisticsApp;
             _logger = logger;
@@ -45,7 +45,7 @@ namespace Telegram.WebAPI.Controllers
         }
 
         [HttpGet("quantity")]
-        public async Task<IActionResult> GetQuantity(bool activate)
+        public async Task<IActionResult> GetQuantity()
         {
             try
             {

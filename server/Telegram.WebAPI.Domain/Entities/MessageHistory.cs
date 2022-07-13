@@ -6,15 +6,11 @@ using Telegram.WebAPI.Domain.Entities;
 
 namespace Telegram.WebAPI.Domain.Entities
 {
-    public class MessageHistory : Entity
+    public class MessageHistory
     {
-        /// <summary>
-        /// Construtor para o ef
-        /// </summary>
-        public MessageHistory() { }
-        public MessageHistory(int clienteId, string textMessage, DateTime messageDate, bool messageSent)
+        public MessageHistory(Guid userId, string textMessage, DateTime messageDate, bool messageSent)
         {
-            this.TelegramUserId = clienteId;
+            this.UserId = userId;
             this.TextMessage = textMessage;
             this.MessageDate = messageDate;
             this.MessageSent = messageSent;
@@ -23,7 +19,6 @@ namespace Telegram.WebAPI.Domain.Entities
         public DateTime MessageDate { get; private set; }
         public bool MessageSent { get; private set; }
 
-        public int TelegramUserId { get; private set; }
-        public virtual TelegramUser TelegramUser { get; set; }
+        public Guid UserId { get; private set; }
     }
 }

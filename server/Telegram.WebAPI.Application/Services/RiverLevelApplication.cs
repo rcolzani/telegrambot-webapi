@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Shared.Extensions;
@@ -19,44 +20,39 @@ namespace Telegram.WebAPI.Application.Services
         private string lastRiverLevel;
         public TelegramBotClient bot;
         private TelegramBotApplication _telegramBotApp;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserRepository _userRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        public RiverLevelApplication(IUnitOfWork unitOfWork, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
+        public RiverLevelApplication(UserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
         {
             _chatHub = chatHub;
-            _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
             _telegramBotApp = telegramBotApplication;
         }
-        public async Task<bool> SendRiverLevel()
+        public async Task SendRiverLevel()
         {
             try
             {
                 string riverLevelHour = "", riverLevel = "";
                 RiverLevelAlertaBlu(out riverLevel, out riverLevelHour);
 
-                if (string.IsNullOrEmpty(riverLevel) || string.IsNullOrEmpty(riverLevelHour))
-                {
-                    //As vezes acontece de o site da prefeitura estar com algum dado vazio e não pode ser enviado nesses casos
-                    return true;
-                }
-                if (lastRiverLevel == riverLevel + riverLevelHour)
-                {
-                    //Se o nível e o horário da medição continuam o mesmo, não deve enviar o lembrete
-                    return true;                   
-                }
+                bool isValidRiverData = !string.IsNullOrEmpty(riverLevel) && !string.IsNullOrEmpty(riverLevelHour);
+                if (!isValidRiverData)
+                    return;
+
+                bool hasRiverLevelUpdated = lastRiverLevel != riverLevel + riverLevelHour;
+                if (!hasRiverLevelUpdated)
+                    return;
 
                 lastRiverLevel = riverLevel + riverLevelHour;
 
-                foreach (var user in _unitOfWork.TelegramUsers.GetAllUsersWithSendRiverActivate())
+                foreach (var user in await _userRepository.GetAllUsersWithSendRiverActivateAsync())
                 {
                     await _telegramBotApp.sendMessageAsync(user.TelegramChatId, $"O nível do rio está {riverLevel} às {riverLevelHour}");
                 }
-                return true;
             }
             catch (Exception e)
             {
                 e.LogExceptionToConsole();
-                return false;
             }
         }
         private void RiverLevelAlertaBlu(out string riverLevel, out string riverLevelHour)

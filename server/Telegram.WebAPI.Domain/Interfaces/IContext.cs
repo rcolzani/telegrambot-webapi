@@ -9,7 +9,7 @@ namespace Telegram.WebAPI.Domain.Interfaces
 {
     public interface IContext 
     {
-        public DbSet<TelegramUser> TelegramUser { get; set; }
+        public DbSet<User> TelegramUser { get; set; }
         public DbSet<MessageHistory> Messages { get; set; }
         public DbSet<Reminder> Reminder { get; set; }
 

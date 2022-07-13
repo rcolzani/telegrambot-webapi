@@ -7,16 +7,16 @@ using Telegram.WebAPI.Domain.Entities;
 
 namespace Telegram.WebAPI.Domain.Interfaces
 {
-    public interface ITelegramUserRepository: IRepository<TelegramUser>
+    public interface ITelegramUserRepository: IRepository<User>
     {
-        TelegramUser AddUser(int chatId, out bool isNewClient, string name);
-        Task<TelegramUser> GetUserByIdAsync(int id, bool asNoTracking = false);
-        TelegramUser GetUserById(int id, bool asNoTracking = false);
-        Task<TelegramUser> GetUserByTelegramIdAsync(long id, bool asNoTracking = false);
-        TelegramUser GetUserByTelegramId(long id, bool asNoTracking = false);
-        Task<TelegramUser[]> GetAllUsersAsync();
-        TelegramUser[] GetAllUsers();
-        List<TelegramUser> GetAllUsersWithSendRiverActivate();
-        List<TelegramUser> GetAllUsersWithReminderActivate();
+        User AddUser(int chatId, out bool isNewClient, string name);
+        Task<User> GetUserByIdAsync(int id, bool asNoTracking = false);
+        User GetUserById(int id, bool asNoTracking = false);
+        Task<User> GetUserByTelegramIdAsync(long id, bool asNoTracking = false);
+        User GetUserByTelegramId(long id, bool asNoTracking = false);
+        Task<User[]> GetAllUsersAsync();
+        User[] GetAllUsers();
+        List<User> GetAllUsersWithSendRiverActivate();
+        List<User> GetAllUsersWithReminderActivate();
     }
 }
