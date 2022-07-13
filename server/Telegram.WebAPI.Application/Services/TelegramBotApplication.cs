@@ -11,6 +11,7 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.WebAPI.Application.Hubs.Models;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
+using Telegram.WebAPI.Data.Cache;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Repositories;
@@ -27,15 +28,29 @@ namespace Telegram.WebAPI.Application.Services
         private readonly UserRepository _userRepository;
         private readonly MessageHistoryRepository _messageRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
+        private readonly UserRepositoryCache _userCache;
         ILogger<TelegramBotApplication> _logger;
 
-        public TelegramBotApplication(UserRepository userRepository, MessageHistoryRepository messageRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger)
+        public TelegramBotApplication(UserRepository userRepository, MessageHistoryRepository messageRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger, UserRepositoryCache userCache)
         {
             _chatHub = chatHub;
             _userRepository = userRepository;
             _messageRepository = messageRepository;
             _logger = logger;
+            _userCache = userCache;
         }
+
+        private  User AddOrCreateUser(int chatId, out bool isNewUser, string name)
+        {
+            isNewUser = false;
+            var usuario = _userCache.GetUserByTelegramIdAsync(chatId).Result;
+
+            if (usuario != null)
+                return usuario;
+
+            return _userRepository.AddUser(chatId, out isNewUser, name);
+        }
+
         public async Task PrepareQuestionnaires(MessageEventArgs e)
         {
             try
@@ -44,7 +59,7 @@ namespace Telegram.WebAPI.Application.Services
                 bool isNewUser = false;
 
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
-                var user = _userRepository.AddUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
+                var user = AddOrCreateUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
                 var userLastReminder = user.GetLastCreatedReminder();

@@ -20,6 +20,7 @@ using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.HostedServices;
+using Telegram.WebAPI.Data.Cache;
 
 namespace Telegram.WebAPI
 {
@@ -38,8 +39,12 @@ namespace Telegram.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.RegisterMongoDbRepositories();
+            
+            
             services.AddDistributedMemoryCache();
             services.AddMemoryCache();
+            services.AddSingleton<UserRepositoryCache>();
+
 
             Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
             Functions.Settings.ControllerActionsPassword = Configuration["ControllerActionsPassword"];

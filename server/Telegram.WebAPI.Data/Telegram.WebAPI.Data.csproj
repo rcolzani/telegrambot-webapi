@@ -14,8 +14,4 @@
     <ProjectReference Include="..\Telegram.WebAPI.Domain\Telegram.WebAPI.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Cache\" />
-  </ItemGroup>
-
 </Project>
