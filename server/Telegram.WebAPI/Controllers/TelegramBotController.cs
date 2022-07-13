@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 using Telegram.WebAPI.Application.Services;
-using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Domain.DTO;
-using Telegram.WebAPI.Domain.Interfaces;
 
 namespace Telegram.WebAPI.Controllers
 {
@@ -44,8 +41,8 @@ namespace Telegram.WebAPI.Controllers
             return Ok(Functions.Settings.TelegramBotActivated);
         }
 
-        [HttpGet("quantity")]
-        public async Task<IActionResult> GetQuantity()
+        [HttpGet("Quantity")]
+        public async Task<IActionResult> Quantity()
         {
             try
             {

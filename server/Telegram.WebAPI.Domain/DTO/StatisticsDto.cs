@@ -6,6 +6,10 @@ namespace Telegram.WebAPI.Domain.DTO
 {
    public class StatisticsDto
     {
+        public StatisticsDto()
+        {
+
+        }
         public StatisticsDto(int activeUsersQuantity, int usersQuantity, int messagesReceivedQuantity, int messagesSentQuantity)
         {
             ActiveUsersQuantity = activeUsersQuantity;
