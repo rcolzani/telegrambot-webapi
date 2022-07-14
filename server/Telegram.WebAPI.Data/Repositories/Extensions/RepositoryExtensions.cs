@@ -14,11 +14,7 @@ namespace Telegram.WebAPI.Domain.Repositories
         {
             servicesBuilder.AddSingleton<IMongoClient, MongoClient>(s =>
             {
-                string dataBaseUri = System.Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-
-                if(Debugger.IsAttached)
-                    dataBaseUri = s.GetRequiredService<IConfiguration>().GetSection("DB_CONNECTION_STRING").Value;
-
+                string dataBaseUri = s.GetRequiredService<IConfiguration>().GetSection("DB_CONNECTION_STRING").Value;
                 return new MongoClient(dataBaseUri);
             });
 

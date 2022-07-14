@@ -47,8 +47,8 @@ namespace Telegram.WebAPI
             services.AddSingleton<IUserRepositoryCache, UserRepositoryCache>();
 
 
-            Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
-            Functions.Settings.ControllerActionsPassword = Configuration["ControllerActionsPassword"];
+            Functions.Settings.TelegramToken = Configuration["TELEGRAM_BOT_TOKEN"];
+            Functions.Settings.ControllerActionsPassword = Configuration["CONTROLLER_ACTION_PASSWORD"];
             Functions.Settings.DatabaseName = "telegrambotreminder";
 
 
