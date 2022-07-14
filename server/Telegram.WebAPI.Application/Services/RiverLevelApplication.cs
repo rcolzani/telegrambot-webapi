@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Interfaces.Application;
 using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
@@ -15,14 +16,14 @@ using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.Application.Services
 {
-    public class RiverLevelApplication
+    public class RiverLevelApplication : IRiverLevelApplication
     {
         private string lastRiverLevel;
         public TelegramBotClient bot;
         private TelegramBotApplication _telegramBotApp;
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        public RiverLevelApplication(UserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
+        public RiverLevelApplication(IUserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
         {
             _chatHub = chatHub;
             _userRepository = userRepository;

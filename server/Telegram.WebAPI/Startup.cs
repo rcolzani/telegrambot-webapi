@@ -21,6 +21,7 @@ using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.HostedServices;
 using Telegram.WebAPI.Data.Cache;
+using Telegram.WebAPI.Domain.Interfaces.Application;
 
 namespace Telegram.WebAPI
 {
@@ -43,7 +44,7 @@ namespace Telegram.WebAPI
             
             services.AddDistributedMemoryCache();
             services.AddMemoryCache();
-            services.AddSingleton<UserRepositoryCache>();
+            services.AddSingleton<IUserRepositoryCache, UserRepositoryCache>();
 
 
             Functions.Settings.TelegramToken = Configuration["TelegramBotToken"];
@@ -61,8 +62,8 @@ namespace Telegram.WebAPI
             //services.AddSingleton<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<TelegramBotApplication>();
-            services.AddSingleton<ReminderApplication>();
-            services.AddSingleton<RiverLevelApplication>();
+            services.AddSingleton<IReminderApplication, ReminderApplication>();
+            services.AddSingleton<IRiverLevelApplication, RiverLevelApplication>();
             services.AddSingleton<StatisticsApplication>();
 
             services.AddSingleton<IConfiguration>(Configuration);

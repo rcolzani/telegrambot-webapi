@@ -11,6 +11,7 @@ using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
 using Telegram.WebAPI.Data.Cache;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Interfaces.Data;
 using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
@@ -21,13 +22,13 @@ namespace Telegram.WebAPI.Application.Services
     public class TelegramBotApplication
     {
         public TelegramBotClient bot;
-        private readonly UserRepository _userRepository;
-        private readonly MessageHistoryRepository _messageRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMessageHistoryRepository _messageRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        private readonly UserRepositoryCache _userCache;
+        private readonly IUserRepositoryCache _userCache;
         ILogger<TelegramBotApplication> _logger;
 
-        public TelegramBotApplication(UserRepository userRepository, MessageHistoryRepository messageRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger, UserRepositoryCache userCache)
+        public TelegramBotApplication(IUserRepository userRepository, IMessageHistoryRepository messageRepository, IHubContext<ChatHub, IChatClient> chatHub, ILogger<TelegramBotApplication> logger, IUserRepositoryCache userCache)
         {
             _chatHub = chatHub;
             _userRepository = userRepository;
