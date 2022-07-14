@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Interfaces.Data;
 
 namespace Telegram.WebAPI.Domain.Repositories
 {
-    public class MessageHistoryRepository 
+    public class MessageHistoryRepository : IMessageHistoryRepository
     {
 
         private readonly IMongoCollection<MessageHistory> _messageCollection;

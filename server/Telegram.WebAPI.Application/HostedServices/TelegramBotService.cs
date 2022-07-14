@@ -11,6 +11,7 @@ using Telegram.Bot.Args;
 using Telegram.WebAPI.Application.Hubs.Models;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
 using Telegram.WebAPI.Application.Services;
+using Telegram.WebAPI.Domain.Interfaces.Application;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Shared.Extensions;
@@ -31,15 +32,14 @@ namespace Telegram.WebAPI.HostedServices
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
         private bool telegramBotRunning = false;
         private TelegramBotApplication _telegramBotApplication;
-        private ReminderApplication _reminderApplication;
-        private RiverLevelApplication _riverLevelApp;
+        private IReminderApplication _reminderApplication;
+        private IRiverLevelApplication _riverLevelApp;
 
-        private List<ReceivedMessage> receivedMessagesToProcess;
         public TelegramBotService(IHubContext<ChatHub,
             IChatClient> chatHub,
             TelegramBotApplication telegramBotApplication,
-            ReminderApplication reminderApplication,
-            RiverLevelApplication riverLevelApp,
+            IReminderApplication reminderApplication,
+            IRiverLevelApplication riverLevelApp,
             ILogger<TelegramBotService> logger)
         {
             _logger = logger;
@@ -54,8 +54,6 @@ namespace Telegram.WebAPI.HostedServices
             bot = new TelegramBotClient(_token);
             bot.OnMessage += botMessageReceiver;
             Settings.TelegramBotActivated = true;
-
-            receivedMessagesToProcess = new List<ReceivedMessage>();
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -141,22 +139,6 @@ namespace Telegram.WebAPI.HostedServices
                 chatMessage.User = chatMessage.User.Substring(0, 2);
             }
             await _chatHub.Clients.All.ReceiveMessage(chatMessage);
-        }
-        private class ReceivedMessage
-        {
-            public MessageEventArgs Message { get; private set; }
-            public bool IsProcessed { get; private set; }
-
-            public ReceivedMessage(MessageEventArgs message)
-            {
-                this.Message = message;
-                IsProcessed = false;
-            }
-
-            public void SetAsProcessed()
-            {
-                this.IsProcessed = true;
-            }
         }
     }
 }

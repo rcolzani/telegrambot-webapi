@@ -8,9 +8,9 @@ namespace Telegram.WebAPI.Application.Services
 {
     public class StatisticsApplication
     {
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public StatisticsApplication(UserRepository userRepository)
+        public StatisticsApplication(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

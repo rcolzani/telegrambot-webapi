@@ -12,7 +12,7 @@ using Telegram.WebAPI.Domain.Interfaces;
 
 namespace Telegram.WebAPI.Domain.Repositories
 {
-    public class UserRepository 
+    public class UserRepository : IUserRepository
     {
         private readonly IMongoCollection<User> _userCollection;
 
@@ -32,7 +32,7 @@ namespace Telegram.WebAPI.Domain.Repositories
         public User AddUser(int chatId, out bool isNewUser, string name)
         {
             isNewUser = false;
-            var user = GetUserByTelegramIdAsync(chatId, false).Result;
+            var user = GetUserByTelegramIdAsync(chatId).Result;
 
             if (user == null)
             {
@@ -55,12 +55,12 @@ namespace Telegram.WebAPI.Domain.Repositories
             return result;
         }
 
-        public async Task<User> GetUserByIdAsync(Guid id, bool asNoTracking = false)
+        public async Task<User> GetUserByIdAsync(Guid id)
         {
             return await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetUserByTelegramIdAsync(long id, bool asNoTracking = false)
+        public async Task<User> GetUserByTelegramIdAsync(long id)
         {
             return await _userCollection.Find(u => u.TelegramChatId == id).FirstOrDefaultAsync();
         }

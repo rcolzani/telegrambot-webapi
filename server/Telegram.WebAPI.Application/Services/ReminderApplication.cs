@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Interfaces.Application;
 using Telegram.WebAPI.Domain.Repositories;
 using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
@@ -9,12 +10,12 @@ using Telegram.WebAPI.Shared.Extensions;
 
 namespace Telegram.WebAPI.Application.Services
 {
-    public class ReminderApplication
+    public class ReminderApplication : IReminderApplication
     {
         private TelegramBotApplication _telegramBotApp;
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        public ReminderApplication(UserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
+        public ReminderApplication(IUserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
         {
             _chatHub = chatHub;
             _userRepository = userRepository;

@@ -4,16 +4,17 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.Entities;
+using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Repositories;
 
 namespace Telegram.WebAPI.Data.Cache
 {
-    public class UserRepositoryCache
+    public class UserRepositoryCache : IUserRepositoryCache
     {
         private readonly IDistributedCache _cache;
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserRepositoryCache(UserRepository userRepository, IDistributedCache cache)
+        public UserRepositoryCache(IUserRepository userRepository, IDistributedCache cache)
         {
             _cache = cache;
             _userRepository = userRepository;
@@ -33,7 +34,7 @@ namespace Telegram.WebAPI.Data.Cache
             return userFromDatabase;
         }
 
-        public async Task<User> GetUserByTelegramIdAsync(long id, bool asNoTracking = false)
+        public async Task<User> GetUserByTelegramIdAsync(long id)
         {
             string cacheKey = $"usertelegramid-{id.ToString()}";
             var result = await _cache.GetAsync(cacheKey);
