@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using System.Diagnostics;
+using Telegram.WebAPI.Domain.Interfaces;
+using Telegram.WebAPI.Domain.Interfaces.Data;
 using Telegram.WebAPI.Domain.Repositories;
 
 namespace Telegram.WebAPI.Domain.Repositories
@@ -11,11 +14,16 @@ namespace Telegram.WebAPI.Domain.Repositories
         {
             servicesBuilder.AddSingleton<IMongoClient, MongoClient>(s =>
             {
-                var uri = s.GetRequiredService<IConfiguration>()["ConnectionStrings:MongoUri"];
-                return new MongoClient(uri);
+                string dataBaseUri = System.Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+                if(Debugger.IsAttached)
+                    dataBaseUri = s.GetRequiredService<IConfiguration>().GetSection("DB_CONNECTION_STRING").Value;
+
+                return new MongoClient(dataBaseUri);
             });
-            servicesBuilder.AddSingleton<UserRepository>();
-            servicesBuilder.AddSingleton<MessageHistoryRepository>();
+
+            servicesBuilder.AddSingleton<IUserRepository, UserRepository>();
+            servicesBuilder.AddSingleton<IMessageHistoryRepository, MessageHistoryRepository>();
         }
     }
 }
