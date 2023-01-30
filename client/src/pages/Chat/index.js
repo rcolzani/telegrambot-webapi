@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr';
+import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ChatWindow from './ChatWindow';
-import Actions from '../Actions'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCogs } from '@fortawesome/free-solid-svg-icons'
 import { Title, Container, ServerStatus, ServerActions, Messages } from './styles';
@@ -71,6 +70,7 @@ const Chat = () => {
                 updateServerStatus("Conexão falhou com o servidor", statusServerEnum.Falhou)
                 console.log('Connection failed: ', e)
             });
+        // eslint-disable-next-line     
     }, []);
 
     return (

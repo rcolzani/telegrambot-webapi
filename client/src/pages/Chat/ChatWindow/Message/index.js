@@ -1,8 +1,6 @@
 import React from 'react';
 import { Container } from './styles';
 import getFormattedDate from '../../../../utils/getFormattedDate';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCogs } from '@fortawesome/free-solid-svg-icons'
 
 const Message = (props) => {
 

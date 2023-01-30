@@ -22,6 +22,7 @@ using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.HostedServices;
 using Telegram.WebAPI.Data.Cache;
 using Telegram.WebAPI.Domain.Interfaces.Application;
+using Telegram.WebAPI.IoC;
 
 namespace Telegram.WebAPI
 {
@@ -39,18 +40,7 @@ namespace Telegram.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.RegisterMongoDbRepositories();
-            
-            
-            services.AddDistributedMemoryCache();
-            services.AddMemoryCache();
-            services.AddSingleton<IUserRepositoryCache, UserRepositoryCache>();
-
-
-            Functions.Settings.TelegramToken = Configuration["TELEGRAM_BOT_TOKEN"];
-            Functions.Settings.ControllerActionsPassword = Configuration["CONTROLLER_ACTION_PASSWORD"];
-            Functions.Settings.DatabaseName = "telegrambotreminder";
-
+            services.AddInfrastructure(Configuration);
 
             services.AddControllers().AddNewtonsoftJson(options =>
              options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -58,17 +48,6 @@ namespace Telegram.WebAPI
             services.AddControllers();
 
             services.AddSignalR();
-
-            //services.AddSingleton<IUnitOfWork, UnitOfWork>();
-
-            services.AddSingleton<TelegramBotApplication>();
-            services.AddSingleton<IReminderApplication, ReminderApplication>();
-            services.AddSingleton<IRiverLevelApplication, RiverLevelApplication>();
-            services.AddSingleton<StatisticsApplication>();
-
-            services.AddSingleton<IConfiguration>(Configuration);
-
-            services.AddHostedService<TelegramBotService>();
 
             var origins = new string[2];
             origins.SetValue("https://telbot.rcolzani.com", 0);

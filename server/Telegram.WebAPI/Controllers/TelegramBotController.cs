@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using Telegram.WebAPI.Application.Interfaces;
 using Telegram.WebAPI.Application.Services;
 using Telegram.WebAPI.Domain.DTO;
 
@@ -12,9 +13,9 @@ namespace Telegram.WebAPI.Controllers
     [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase
     {
-        private StatisticsApplication _statisticsApp;
+        private IStatisticsService _statisticsApp;
         private readonly ILogger<TelegramBotController> _logger;
-        public TelegramBotController(ILogger<TelegramBotController> logger, StatisticsApplication statisticsApp)
+        public TelegramBotController(ILogger<TelegramBotController> logger, IStatisticsService statisticsApp)
         {
             _statisticsApp = statisticsApp;
             _logger = logger;
