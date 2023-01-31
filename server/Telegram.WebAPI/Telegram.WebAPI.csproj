@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -17,6 +17,7 @@
  <ItemGroup>
    <ProjectReference Include="..\Telegram.WebAPI.Application\Telegram.WebAPI.Application.csproj" />
    <ProjectReference Include="..\Telegram.WebAPI.Domain\Telegram.WebAPI.Domain.csproj" />
+   <ProjectReference Include="..\Telegram.WebAPI.IoC\Telegram.WebAPI.IoC.csproj" />
    <ProjectReference Include="..\Telegram.WebAPI.Shared\Telegram.WebAPI.Shared.csproj" />
  </ItemGroup>
 

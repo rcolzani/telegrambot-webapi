@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Telegram.WebAPI.Application.Interfaces;
 using Telegram.WebAPI.Domain.DTO;
 using Telegram.WebAPI.Domain.Interfaces;
-using Telegram.WebAPI.Domain.Repositories;
 
 namespace Telegram.WebAPI.Application.Services
 {
-    public class StatisticsApplication
+    public class StatisticsService : IStatisticsService
     {
         private readonly IUserRepository _userRepository;
 
-        public StatisticsApplication(IUserRepository userRepository)
+        public StatisticsService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

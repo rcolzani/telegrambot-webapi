@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Telegram.WebAPI.Application.Interfaces;
 using Telegram.WebAPI.Application.Services;
 using Telegram.WebAPI.Domain.DTO;
 
@@ -15,9 +16,9 @@ namespace Telegram.WebAPI.Controllers
     [ApiController]
     public class StatisticsController : ControllerBase
     {
-        private StatisticsApplication _statisticsApp;
+        private IStatisticsService _statisticsApp;
         private readonly ILogger<TelegramBotController> _logger;
-        public StatisticsController(ILogger<TelegramBotController> logger, StatisticsApplication statisticsApp)
+        public StatisticsController(ILogger<TelegramBotController> logger, IStatisticsService statisticsApp)
         {
             _statisticsApp = statisticsApp;
             _logger = logger;
