@@ -34,7 +34,7 @@ namespace Telegram.WebAPI.Application.Services
             _userCache = userCache;
         }
 
-        private  User AddOrCreateUser(int chatId, out bool isNewUser, string name)
+        private User AddOrCreateUser(int chatId, out bool isNewUser, string name)
         {
             isNewUser = false;
             var usuario = _userCache.GetUserByTelegramIdAsync(chatId).Result;
@@ -198,7 +198,7 @@ namespace Telegram.WebAPI.Application.Services
                 _logger.LogError($"{DateTime.Now} : {ex.ToString()}");
             }
         }
-        private async void ReceivedMessageConsult(User user)
+        private async Task ReceivedMessageConsult(User user)
         {
             try
             {
@@ -206,17 +206,12 @@ namespace Telegram.WebAPI.Application.Services
 
                 var userWithReminders = _userRepository.GetAllRemindersActiveByUser(user.Id);
 
-                if (userWithReminders == null)
-                {
-                    return;
-                }
-
-                foreach (var reminder in userWithReminders?.GetActiveReminders())
+                userWithReminders?.GetActiveReminders().ForEach(reminder =>
                 {
                     remindersConcat += $"{reminder.TextMessage} às {reminder.RemindTimeToSend}\n\n";
+                });
 
-                }
-                if (remindersConcat == "")
+                if (string.IsNullOrEmpty(remindersConcat))
                 {
                     var keyboard = new ReplyKeyboardMarkup
                     {
