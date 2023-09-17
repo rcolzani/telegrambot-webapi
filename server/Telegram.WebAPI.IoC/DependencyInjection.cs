@@ -21,13 +21,8 @@ namespace Telegram.WebAPI.IoC
             Functions.Settings.ControllerActionsPassword = configuration["CONTROLLER_ACTION_PASSWORD"];
             Functions.Settings.DatabaseName = "telegrambotreminder";
 
-
-            services.AddDistributedMemoryCache();
             services.AddMemoryCache();
             services.AddSingleton<IUserRepositoryCache, UserRepositoryCache>();
-
-
-            //services.AddSingleton<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<TelegramBotApplication>();
             services.AddSingleton<IReminderApplication, ReminderApplication>();

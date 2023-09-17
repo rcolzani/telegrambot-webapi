@@ -34,7 +34,7 @@ namespace Telegram.WebAPI.Application.Services
             _userCache = userCache;
         }
 
-        private User AddOrCreateUser(int chatId, out bool isNewUser, string name)
+        private User CreateAndGetUser(int chatId, out bool isNewUser, string name)
         {
             isNewUser = false;
             var usuario = _userCache.GetUserByTelegramIdAsync(chatId).Result;
@@ -45,6 +45,12 @@ namespace Telegram.WebAPI.Application.Services
             return _userRepository.AddUser(chatId, out isNewUser, name);
         }
 
+        private void UpdateUserRepositoryAndCache(User user)
+        {
+            _userRepository.UpdateUser(user);
+            _userCache.SetUserToCacheAsync(user);
+        }
+
         public async Task PrepareQuestionnaires(MessageEventArgs e)
         {
             try
@@ -53,7 +59,7 @@ namespace Telegram.WebAPI.Application.Services
                 bool isNewUser = false;
 
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
-                var user = AddOrCreateUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
+                var user = CreateAndGetUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
                 var userLastReminder = user.GetLastCreatedReminder();
@@ -86,7 +92,7 @@ namespace Telegram.WebAPI.Application.Services
                 }
                 else if (messageReceived == "consultar")
                 {
-                    ReceivedMessageConsult(user);
+                    await ReceivedMessageConsult(user);
                 }
                 else if (messageReceived == "parar")
                 {
@@ -126,7 +132,7 @@ namespace Telegram.WebAPI.Application.Services
                     }
                     user.GetLastCreatedReminder().SetTimeToRemind(sendTime);
                     await sendMessageAsync(user.TelegramChatId, $"Cadastro criado com sucesso!!!{Environment.NewLine}{Environment.NewLine}Você receberá a mensagem: {reminder.TextMessage}{Environment.NewLine}Todos os dias as {reminder.RemindTimeToSend.ToString()}");
-                    _userRepository.UpdateUser(user);
+                    UpdateUserRepositoryAndCache(user);
                 }
                 else
                 {
@@ -177,7 +183,7 @@ namespace Telegram.WebAPI.Application.Services
 
                 await sendMessageAsync(user.TelegramChatId, "Qual horário você deseja ser lembrado? Precisa ser no formato HH:MM!");
                 user.GetLastCreatedReminder().AddReminderText(reminderTextMessage);
-                _userRepository.UpdateUser(user);
+                UpdateUserRepositoryAndCache(user);
             }
             catch (Exception ex)
             {
@@ -191,7 +197,7 @@ namespace Telegram.WebAPI.Application.Services
             {
                 await sendMessageAsync(user.TelegramChatId, "Removido da fila de envio. Para voltar a receber lembretes ou alertas do nível do rio, envie Olá para iniciar o cadastro.");
                 user.StopReminders();
-                _userRepository.UpdateUser(user);
+                UpdateUserRepositoryAndCache(user);
             }
             catch (Exception ex)
             {
@@ -290,7 +296,7 @@ namespace Telegram.WebAPI.Application.Services
             {
                 await sendMessageAsync(user.TelegramChatId, "Qual mensagem você deseja receber ao ser lembrado?");
                 user.Reminders.Add(new Reminder(""));
-                _userRepository.UpdateUser(user);
+                UpdateUserRepositoryAndCache(user);
             }
             catch (Exception ex)
             {
@@ -305,7 +311,7 @@ namespace Telegram.WebAPI.Application.Services
             {
                 await sendMessageAsync(user.TelegramChatId, "Feito!\n\nVocê começará a receber as medições do nível do rio a partir de agora.");
                 user.StartReceiveRiverLevel();
-                _userRepository.UpdateUser(user);
+                UpdateUserRepositoryAndCache(user);
             }
             catch (Exception ex)
             {
