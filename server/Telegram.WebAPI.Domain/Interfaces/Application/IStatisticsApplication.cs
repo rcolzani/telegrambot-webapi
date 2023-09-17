@@ -6,7 +6,7 @@ using Telegram.WebAPI.Domain.DTO;
 
 namespace Telegram.WebAPI.Application.Interfaces
 {
-    public interface IStatisticsService
+    public interface IStatisticsApplication
     {
         Task<StatisticsDto> GetStatistics();
     }

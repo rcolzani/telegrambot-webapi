@@ -32,7 +32,7 @@ namespace Telegram.WebAPI.IoC
             services.AddSingleton<TelegramBotApplication>();
             services.AddSingleton<IReminderApplication, ReminderApplication>();
             services.AddSingleton<IRiverLevelApplication, RiverLevelApplication>();
-            services.AddSingleton<IStatisticsService, StatisticsService>();
+            services.AddSingleton<IStatisticsApplication, StatisticsApplication>();
 
             services.AddSingleton<IConfiguration>(configuration);
 

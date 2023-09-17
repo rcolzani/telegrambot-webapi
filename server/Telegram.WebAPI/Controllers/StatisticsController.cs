@@ -16,9 +16,9 @@ namespace Telegram.WebAPI.Controllers
     [ApiController]
     public class StatisticsController : ControllerBase
     {
-        private IStatisticsService _statisticsApp;
+        private IStatisticsApplication _statisticsApp;
         private readonly ILogger<TelegramBotController> _logger;
-        public StatisticsController(ILogger<TelegramBotController> logger, IStatisticsService statisticsApp)
+        public StatisticsController(ILogger<TelegramBotController> logger, IStatisticsApplication statisticsApp)
         {
             _statisticsApp = statisticsApp;
             _logger = logger;
@@ -42,7 +42,7 @@ namespace Telegram.WebAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro:");
-                return new StatisticsDto(0,0,0,0);
+                return new StatisticsDto(0, 0, 0, 0);
             }
         }
     }
