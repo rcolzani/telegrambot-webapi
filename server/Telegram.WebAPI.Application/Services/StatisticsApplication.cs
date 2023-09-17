@@ -6,11 +6,11 @@ using Telegram.WebAPI.Domain.Interfaces;
 
 namespace Telegram.WebAPI.Application.Services
 {
-    public class StatisticsService : IStatisticsService
+    public class StatisticsApplication : IStatisticsApplication
     {
         private readonly IUserRepository _userRepository;
 
-        public StatisticsService(IUserRepository userRepository)
+        public StatisticsApplication(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

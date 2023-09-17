@@ -13,9 +13,9 @@ namespace Telegram.WebAPI.Controllers
     [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase
     {
-        private IStatisticsService _statisticsApp;
+        private IStatisticsApplication _statisticsApp;
         private readonly ILogger<TelegramBotController> _logger;
-        public TelegramBotController(ILogger<TelegramBotController> logger, IStatisticsService statisticsApp)
+        public TelegramBotController(ILogger<TelegramBotController> logger, IStatisticsApplication statisticsApp)
         {
             _statisticsApp = statisticsApp;
             _logger = logger;

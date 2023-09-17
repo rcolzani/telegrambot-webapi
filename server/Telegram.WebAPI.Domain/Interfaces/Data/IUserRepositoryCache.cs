@@ -8,8 +8,7 @@ namespace Telegram.WebAPI.Domain.Interfaces
 {
     public interface IUserRepositoryCache
     {
-        Task<User> GetUserByIdAsync(Guid id);
         Task<User> GetUserByTelegramIdAsync(long id);
-
+        void SetUserToCacheAsync(User user);
     }
 }
