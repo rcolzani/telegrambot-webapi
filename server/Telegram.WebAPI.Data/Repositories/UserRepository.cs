@@ -20,13 +20,13 @@ namespace Telegram.WebAPI.Domain.Repositories
         {
             var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
             ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
-
             _userCollection = mongoClient.GetDatabase("telegrambotreminder").GetCollection<User>("users");
         }
 
         public void UpdateUser(User user)
         {
-            var result = _userCollection.ReplaceOne(u => u.Id == user.Id, user);
+            var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+            var result = _userCollection.ReplaceOne(filter, user);
         }
 
         public User AddUser(int chatId, out bool isNewUser, string name)
