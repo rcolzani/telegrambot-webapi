@@ -10,6 +10,11 @@ namespace Telegram.WebAPI.Shared.Extensions
     {
         public static string RemoveAccents(this string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+
             StringBuilder sbReturn = new StringBuilder();
             var arrayText = text.Normalize(NormalizationForm.FormD).ToCharArray();
             foreach (char letter in arrayText)
