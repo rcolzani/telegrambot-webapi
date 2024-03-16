@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
-using Telegram.WebAPI.Domain.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Telegram.WebAPI.Data.Cache
