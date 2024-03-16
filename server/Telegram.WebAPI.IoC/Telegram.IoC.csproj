@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Telegram.WebAPI.Application\Telegram.Application.csproj" />
+    <ProjectReference Include="..\Telegram.WebAPI.Data\Telegram.Data.csproj" />
+    <ProjectReference Include="..\Telegram.WebAPI.Domain\Telegram.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
