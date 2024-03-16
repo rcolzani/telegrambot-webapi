@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Args;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.WebAPI.Application.Hubs.Models;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
@@ -51,15 +51,15 @@ namespace Telegram.WebAPI.Application.Services
             _userCache.SetUserToCacheAsync(user);
         }
 
-        public async Task PrepareQuestionnaires(MessageEventArgs e)
+        public async Task PrepareQuestionnaires(TelegramMessageUpdate e)
         {
             try
             {
-                int chatId = (int)e.Message.Chat.Id;
+                int chatId = (int)e.Message.chatId;
                 bool isNewUser = false;
 
                 _logger.LogInformation(DateTime.Now + ": Começou a adicionar o usuário");
-                var user = CreateAndGetUser(chatId, out isNewUser, $"{e.Message.Chat.FirstName.FirstCharToUpper()} {e.Message.Chat.LastName.FirstCharToUpper()}".Trim());
+                var user = CreateAndGetUser(chatId, out isNewUser, $"{e.Message.chatFirstName.FirstCharToUpper()} {e.Message.chatLastName.FirstCharToUpper()}".Trim());
                 _logger.LogInformation(DateTime.Now + ": Adicionou o usuário");
 
                 var userLastReminder = user.GetLastCreatedReminder();
@@ -105,10 +105,10 @@ namespace Telegram.WebAPI.Application.Services
 
                 //O envio de mensagens para o front e a gravação da mensagem recebida devem ser feitas após o processamento da mensagem e envio de resposta ao cliente
                 //assim fica mais rápida a troca de mensagens com o usuário
-                await HubSendMessage(new MessageClient(e.Message.Chat.FirstName, e.Message.Text, e.Message.Date), true);
+                await HubSendMessage(new MessageClient(e.Message.chatFirstName, e.Message.Text, e.Message.chatDateTime), true);
 
                 //Adiciona mensagem no banco de dados
-                await _messageRepository.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.Date, false));
+                await _messageRepository.Add(new MessageHistory(user.Id, e.Message.Text, e.Message.chatDateTime, false));
 
                 //return true;
             }
@@ -150,8 +150,8 @@ namespace Telegram.WebAPI.Application.Services
             try
             {
                 var keyboard = new ReplyKeyboardMarkup
-                {
-                    Keyboard = new[]
+                (
+                    new[]
                              {
                         new[]
                         {
@@ -161,7 +161,7 @@ namespace Telegram.WebAPI.Application.Services
                             new KeyboardButton("Consultar")
                         }
                     }
-                };
+                );
 
                 string texto = $"Selecione uma das opções no teclado que apareceu para você ou digite:{Environment.NewLine}" +
                     $"*Iniciar* - para iniciar o cadastro de um lembrete{Environment.NewLine}" +
@@ -220,15 +220,15 @@ namespace Telegram.WebAPI.Application.Services
                 if (string.IsNullOrEmpty(remindersConcat))
                 {
                     var keyboard = new ReplyKeyboardMarkup
-                    {
-                        Keyboard = new[]
-                        {
+                    (
                         new[]
                         {
-                            new KeyboardButton("Iniciar")
+                            new[]
+                            {
+                                new KeyboardButton("Iniciar")
+                            }
                         }
-                    }
-                    };
+                    );
                     remindersConcat = "Você ainda não tem lembretes cadastrados. Que tal iniciar o cadastro de um novo lembrete?";
                     await sendMessageAsync(user.TelegramChatId, remindersConcat, keyboard);
                 }
@@ -251,9 +251,8 @@ namespace Telegram.WebAPI.Application.Services
         {
             try
             {
-                var keyboard = new ReplyKeyboardMarkup
-                {
-                    Keyboard = new[]
+                var keyboard = new ReplyKeyboardMarkup(
+                     new[]
                  {
                         new[]
                         {
@@ -267,7 +266,7 @@ namespace Telegram.WebAPI.Application.Services
                             new KeyboardButton("Parar")
                         }
                     }
-                };
+                );
 
                 string texto = $"Olá {user.Name}, {Environment.NewLine}{Environment.NewLine}";
 
@@ -334,7 +333,7 @@ namespace Telegram.WebAPI.Application.Services
 
                 if (replyMarkup == null) { replyMarkup = new ReplyKeyboardRemove() { }; }
 
-                var messageSent = await bot.SendTextMessageAsync(telegramClientId, text, Telegram.Bot.Types.Enums.ParseMode.Markdown, false, false, 0, replyMarkup);
+                var messageSent = await bot.SendTextMessageAsync(telegramClientId, text, null, Telegram.Bot.Types.Enums.ParseMode.Markdown, null, null, null, null, null, null, replyMarkup);
 
                 if (string.IsNullOrWhiteSpace(userNameToHide) == false)
                 {

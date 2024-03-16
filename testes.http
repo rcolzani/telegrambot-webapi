@@ -1,18 +1,26 @@
-POST  HTTP/1.1
-header name: header value
+@baseUrl = https://localhost:5001/api
+
 ###
 
-POST http://localhost:5000/telegrambot/ HTTP/1.1
+POST {{baseUrl}}/telegrambot HTTP/1.1
 content-type: application/json
 
 {
-    "activate": true
+    "activate": true,
+    "passwd": "zzzzz"
 }
+
 ###
 
-POST https://bottelegramrcolzani.herokuapp.com/telegrambot HTTP/1.1
+GET {{baseUrl}}/telegrambot HTTP/1.1
 content-type: application/json
 
-{
-    "activate": true
-}
+###
+
+GET {{baseUrl}}/telegrambot/quantity HTTP/1.1
+content-type: application/json
+
+###
+
+GET {{baseUrl}}/statistics HTTP/1.1
+content-type: application/json

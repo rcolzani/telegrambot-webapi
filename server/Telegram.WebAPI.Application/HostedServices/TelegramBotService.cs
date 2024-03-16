@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Args;
+using Telegram.Bot.Exceptions;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.WebAPI.Application.Hubs.Models;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
 using Telegram.WebAPI.Application.Services;
@@ -52,9 +55,34 @@ namespace Telegram.WebAPI.HostedServices
             _riverLevelApp = riverLevelApp;
 
             bot = new TelegramBotClient(_token);
-            bot.OnMessage += botMessageReceiver;
+
+            ReceiverOptions receiverOptions = new()
+            {
+                AllowedUpdates = Array.Empty<UpdateType>() // receive all update types except ChatMember related updates
+            };
+
+            using CancellationTokenSource cts = new();
+
+            bot.StartReceiving(botMessageReceiver,
+            pollingErrorHandler: HandlePollingErrorAsync,
+            receiverOptions: receiverOptions,
+            cancellationToken: cts.Token);
+
             Settings.TelegramBotActivated = true;
         }
+        Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        {
+            var ErrorMessage = exception switch
+            {
+                ApiRequestException apiRequestException
+                    => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => exception.ToString()
+            };
+
+            Console.WriteLine(ErrorMessage);
+            return Task.CompletedTask;
+        }
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _executingTask = ExecuteAsync(_stoppingCts.Token);
@@ -76,12 +104,12 @@ namespace Telegram.WebAPI.HostedServices
                 {
                     if (telegramBotRunning && Settings.TelegramBotActivated == false)
                     {
-                        stopReceiving();
+                        //stopReceiving();
                         await HubSendMessage(new MessageSystem("Server status", "O server foi parado.", DateTime.Now), false);
                     }
                     else if (telegramBotRunning == false && Settings.TelegramBotActivated)
                     {
-                        startReceiving();
+                        //startReceiving();
                         await HubSendMessage(new MessageSystem("Server status", "O server foi iniciado.", DateTime.Now), false);
                     }
 
@@ -116,21 +144,22 @@ namespace Telegram.WebAPI.HostedServices
         {
             return Task.CompletedTask;
         }
+        async Task botMessageReceiver(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var receivedMessage = new TelegramMessageUpdate()
+            {
+                Message = new TelegramMessage()
+                {
+                    chatDateTime = update.Message.Date,
+                    chatFirstName = update.Message.Chat.FirstName,
+                    chatLastName = update.Message.Chat.LastName,
+                    chatId = update.Message.Chat.Id,
+                    Text = update.Message.Text
+                }
+            };
+            await _telegramBotApplication.PrepareQuestionnaires(receivedMessage);
+        }
 
-        private async void botMessageReceiver(object sender, MessageEventArgs e)
-        {
-            await _telegramBotApplication.PrepareQuestionnaires(e);
-        }
-        private void startReceiving()
-        {
-            bot.StartReceiving();
-            telegramBotRunning = true;
-        }
-        private void stopReceiving()
-        {
-            bot.StopReceiving();
-            telegramBotRunning = false;
-        }
         private async Task HubSendMessage(MessageBase chatMessage, bool limitUsername)
         {
             if (limitUsername && chatMessage.User != null)
