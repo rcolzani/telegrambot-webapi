@@ -9,6 +9,7 @@ public class StringExtensionTests
     [InlineData("", "")]
     [InlineData(" ", " ")]
     [InlineData(null, null)]
+    [InlineData("á", "b")]
     public async void ItRemovesAccents(string value, string expectedResult)
     {
         var result = value.RemoveAccents();
