@@ -4,46 +4,45 @@ using Telegram.WebAPI.Domain.Entities;
 using Telegram.WebAPI.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Telegram.WebAPI.Data.Cache
+namespace Telegram.WebAPI.Data.Cache;
+
+public class UserRepositoryCache : IUserRepositoryCache
 {
-    public class UserRepositoryCache : IUserRepositoryCache
+    private readonly IMemoryCache _cache;
+    private readonly IUserRepository _userRepository;
+    private readonly MemoryCacheEntryOptions _memoryCacheEntryOptions;
+    public UserRepositoryCache(IUserRepository userRepository, IMemoryCache cache)
     {
-        private readonly IMemoryCache _cache;
-        private readonly IUserRepository _userRepository;
-        private readonly MemoryCacheEntryOptions _memoryCacheEntryOptions;
-        public UserRepositoryCache(IUserRepository userRepository, IMemoryCache cache)
+        _cache = cache;
+        _userRepository = userRepository;
+        _memoryCacheEntryOptions = new MemoryCacheEntryOptions()
         {
-            _cache = cache;
-            _userRepository = userRepository;
-            _memoryCacheEntryOptions = new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
-            };
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
+        };
+    }
+
+    public async Task<User> GetUserByTelegramIdAsync(long telegramId)
+    {
+        string cacheKey = GenerateCacheKeyByUser(telegramId);
+
+        if (_cache.TryGetValue(cacheKey, out User cachedUser))
+        {
+            return cachedUser;
         }
 
-        public async Task<User> GetUserByTelegramIdAsync(long telegramId)
-        {
-            string cacheKey = GenerateCacheKeyByUser(telegramId);
+        var userFromDatabase = await _userRepository.GetUserByTelegramIdAsync(telegramId);
+        _cache.Set(cacheKey, userFromDatabase, _memoryCacheEntryOptions);
+        return userFromDatabase;
+    }
 
-            if (_cache.TryGetValue(cacheKey, out User cachedUser))
-            {
-                return cachedUser;
-            }
+    public void SetUserToCacheAsync(User user)
+    {
+        var cacheKey = GenerateCacheKeyByUser(user.TelegramChatId);
+        _cache.Set(cacheKey, user, _memoryCacheEntryOptions);
+    }
 
-            var userFromDatabase = await _userRepository.GetUserByTelegramIdAsync(telegramId);
-            _cache.Set(cacheKey, userFromDatabase, _memoryCacheEntryOptions);
-            return userFromDatabase;
-        }
-
-        public void SetUserToCacheAsync(User user)
-        {
-            var cacheKey = GenerateCacheKeyByUser(user.TelegramChatId);
-            _cache.Set(cacheKey, user, _memoryCacheEntryOptions);
-        }
-
-        private string GenerateCacheKeyByUser(long telegramId)
-        {
-            return $"usertelegramid-{telegramId.ToString()}";
-        }
+    private string GenerateCacheKeyByUser(long telegramId)
+    {
+        return $"usertelegramid-{telegramId.ToString()}";
     }
 }

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.Entities;
 
-namespace Telegram.WebAPI.Domain.Interfaces
+namespace Telegram.WebAPI.Domain.Interfaces;
+
+public interface IUserRepositoryCache
 {
-    public interface IUserRepositoryCache
-    {
-        Task<User> GetUserByTelegramIdAsync(long id);
-        void SetUserToCacheAsync(User user);
-    }
+    Task<User> GetUserByTelegramIdAsync(long id);
+    void SetUserToCacheAsync(User user);
 }

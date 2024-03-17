@@ -4,28 +4,27 @@ using Telegram.WebAPI.Application.Interfaces;
 using Telegram.WebAPI.Domain.DTO;
 using Telegram.WebAPI.Domain.Interfaces;
 
-namespace Telegram.WebAPI.Application.Services
+namespace Telegram.WebAPI.Application.Services;
+
+public class StatisticsApplication : IStatisticsApplication
 {
-    public class StatisticsApplication : IStatisticsApplication
+    private readonly IUserRepository _userRepository;
+
+    public StatisticsApplication(IUserRepository userRepository)
     {
-        private readonly IUserRepository _userRepository;
+        _userRepository = userRepository;
+    }
 
-        public StatisticsApplication(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
+    public async Task<StatisticsDto> GetStatistics()
+    {
+        var users = await _userRepository.GetAllUsersAsync();
+        //var messages = await _userRepository.GetAllMessagesAsync();
 
-        public async Task<StatisticsDto> GetStatistics()
-        {
-            var users = await _userRepository.GetAllUsersAsync();
-            //var messages = await _userRepository.GetAllMessagesAsync();
+        var userQuantity = users.Count();
+        var activeClientsQuantity = users.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >= 1).Count();
+        var messageReceivedQuantity = 0;// messages.Where(m => m.MessageSent == false).Count();
+        var messageSentQuantity = 0; // messages.Where(m => m.MessageSent).Count();
 
-            var userQuantity = users.Count();
-            var activeClientsQuantity = users.Where(c => c.Reminders.Where(r => r.Status == Domain.Enums.ReminderStatus.Activated).Count() >= 1).Count();
-            var messageReceivedQuantity = 0;// messages.Where(m => m.MessageSent == false).Count();
-            var messageSentQuantity = 0; // messages.Where(m => m.MessageSent).Count();
-
-            return new StatisticsDto(activeClientsQuantity, userQuantity, messageReceivedQuantity, messageSentQuantity);
-        }
+        return new StatisticsDto(activeClientsQuantity, userQuantity, messageReceivedQuantity, messageSentQuantity);
     }
 }
