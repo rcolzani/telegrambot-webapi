@@ -2,46 +2,42 @@
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Telegram.WebAPI.Data;
 using Telegram.WebAPI.Domain.Entities;
-using Telegram.WebAPI.Domain.Interfaces;
 using Telegram.WebAPI.Domain.Interfaces.Data;
 
-namespace Telegram.WebAPI.Domain.Repositories
+namespace Telegram.WebAPI.Domain.Repositories;
+
+public class MessageHistoryRepository : IMessageHistoryRepository
 {
-    public class MessageHistoryRepository : IMessageHistoryRepository
+
+    private readonly IMongoCollection<MessageHistory> _messageCollection;
+
+    public MessageHistoryRepository(IMongoClient mongoClient)
     {
+        var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
+        ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
 
-        private readonly IMongoCollection<MessageHistory> _messageCollection;
+        _messageCollection = mongoClient.GetDatabase("telegrambotreminder").GetCollection<MessageHistory>("Messages");
 
-        public MessageHistoryRepository(IMongoClient mongoClient)
+    }
+
+    public async Task<List<MessageHistory>> GetAllMessagesAsync()
+    {
+        try
         {
-            var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
-            ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
+            var filter = Builders<MessageHistory>.Filter.Empty;
 
-            _messageCollection = mongoClient.GetDatabase("telegrambotreminder").GetCollection<MessageHistory>("Messages");
-
+            return await _messageCollection.Find(filter)
+                .SortBy(a => a.MessageDate).ToListAsync();
         }
-
-        public async Task<List<MessageHistory>> GetAllMessagesAsync()
+        catch (Exception)
         {
-            try
-            {
-                var filter = Builders<MessageHistory>.Filter.Empty;
-
-                return await _messageCollection.Find(filter)
-                    .SortBy(a => a.MessageDate).ToListAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            throw;
         }
-        public async Task Add(MessageHistory message)
-        {
-            await _messageCollection.InsertOneAsync(message);
-        }
+    }
+    public async Task Add(MessageHistory message)
+    {
+        await _messageCollection.InsertOneAsync(message);
     }
 }

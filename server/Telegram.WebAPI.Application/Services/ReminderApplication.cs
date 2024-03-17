@@ -7,51 +7,50 @@ using Telegram.WebAPI.Hubs;
 using Telegram.WebAPI.Hubs.Clients;
 using Telegram.WebAPI.Shared.Extensions;
 
-namespace Telegram.WebAPI.Application.Services
-{
-    public class ReminderApplication : IReminderApplication
-    {
-        private TelegramBotApplication _telegramBotApp;
-        private readonly IUserRepository _userRepository;
-        private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        public ReminderApplication(IUserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
-        {
-            _chatHub = chatHub;
-            _userRepository = userRepository;
-            _telegramBotApp = telegramBotApplication;
-        }
+namespace Telegram.WebAPI.Application.Services;
 
-        public async Task<bool> SendReminders()
+public class ReminderApplication : IReminderApplication
+{
+    private TelegramBotApplication _telegramBotApp;
+    private readonly IUserRepository _userRepository;
+    private readonly IHubContext<ChatHub, IChatClient> _chatHub;
+    public ReminderApplication(IUserRepository userRepository, IHubContext<ChatHub, IChatClient> chatHub, TelegramBotApplication telegramBotApplication)
+    {
+        _chatHub = chatHub;
+        _userRepository = userRepository;
+        _telegramBotApp = telegramBotApplication;
+    }
+
+    public async Task<bool> SendReminders()
+    {
+        try
         {
-            try
+            var users = _userRepository.GetAllRemindersActive();
+            foreach (var user in users)
             {
-                var users = _userRepository.GetAllRemindersActive();
-                foreach (var user in users)
+                foreach (var reminder in user.Reminders)
                 {
-                    foreach (var reminder in user.Reminders)
+                    if ((DateTime.Now.Date + reminder.RemindTimeToSend) <= DateTime.Now && reminder.RemindedAt.Date < DateTime.Now.Date) //considerar enviar 
                     {
-                        if ((DateTime.Now.Date + reminder.RemindTimeToSend) <= DateTime.Now && reminder.RemindedAt.Date < DateTime.Now.Date) //considerar enviar 
+                        if (reminder.RemindedAt == new DateTime())
                         {
-                            if (reminder.RemindedAt == new DateTime())
-                            {
-                                await _telegramBotApp.sendMessageAsync(user.TelegramChatId, reminder.TextMessage);
-                            }
-                            else if (reminder.RemindedAt.AddMinutes(-5) < DateTime.Now)
-                            {
-                                await _telegramBotApp.sendMessageAsync(user.TelegramChatId, reminder.TextMessage);
-                            }
-                            reminder.SetReminded();
+                            await _telegramBotApp.sendMessageAsync(user.TelegramChatId, reminder.TextMessage);
                         }
+                        else if (reminder.RemindedAt.AddMinutes(-5) < DateTime.Now)
+                        {
+                            await _telegramBotApp.sendMessageAsync(user.TelegramChatId, reminder.TextMessage);
+                        }
+                        reminder.SetReminded();
                     }
-                    _userRepository.UpdateUser(user);
                 }
-                return true;
+                _userRepository.UpdateUser(user);
             }
-            catch (Exception e)
-            {
-                e.LogExceptionToConsole();
-                return false;
-            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            e.LogExceptionToConsole();
+            return false;
         }
     }
 }

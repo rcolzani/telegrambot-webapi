@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Telegram.WebAPI.Domain.Interfaces.Application
+namespace Telegram.WebAPI.Domain.Interfaces.Application;
+public interface IRiverLevelApplication
 {
-    public interface IRiverLevelApplication
-    {
-        Task SendRiverLevel();
-    }
+    Task SendRiverLevel();
 }

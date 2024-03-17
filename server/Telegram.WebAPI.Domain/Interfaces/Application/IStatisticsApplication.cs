@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.DTO;
 
-namespace Telegram.WebAPI.Application.Interfaces
+namespace Telegram.WebAPI.Application.Interfaces;
+
+public interface IStatisticsApplication
 {
-    public interface IStatisticsApplication
-    {
-        Task<StatisticsDto> GetStatistics();
-    }
+    Task<StatisticsDto> GetStatistics();
 }
+

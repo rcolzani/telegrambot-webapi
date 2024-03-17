@@ -1,12 +1,9 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Application.Hubs.Models.Interfaces;
-using Telegram.WebAPI.Hubs.Models;
 
-namespace Telegram.WebAPI.Hubs.Clients
+namespace Telegram.WebAPI.Hubs.Clients;
+
+public interface IChatClient
 {
-    public interface IChatClient
-    {
-        Task ReceiveMessage(MessageBase message);
-    }
+    Task ReceiveMessage(MessageBase message);
 }

@@ -1,26 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Telegram.WebAPI.Domain.DTO;
 
-namespace Telegram.WebAPI.Domain.DTO
+public class StatisticsDto(int activeUsersQuantity, int usersQuantity, int messagesReceivedQuantity, int messagesSentQuantity)
 {
-   public class StatisticsDto
-    {
-        public StatisticsDto()
-        {
-
-        }
-        public StatisticsDto(int activeUsersQuantity, int usersQuantity, int messagesReceivedQuantity, int messagesSentQuantity)
-        {
-            ActiveUsersQuantity = activeUsersQuantity;
-            UsersQuantity = usersQuantity;
-            MessagesReceivedQuantity = messagesReceivedQuantity;
-            MessagesSentQuantity = messagesSentQuantity;
-        }
-
-        public int ActiveUsersQuantity { get; private set; }
-        public int UsersQuantity { get; private set; }
-        public int MessagesReceivedQuantity { get; private set; }
-        public int MessagesSentQuantity { get; private set; }
-    }
+    public int ActiveUsersQuantity => activeUsersQuantity;
+    public int UsersQuantity => usersQuantity;
+    public int MessagesReceivedQuantity => messagesReceivedQuantity;
+    public int MessagesSentQuantity => messagesSentQuantity;
 }

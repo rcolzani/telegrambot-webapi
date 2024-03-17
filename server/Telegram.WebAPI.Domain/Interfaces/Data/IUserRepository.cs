@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.WebAPI.Domain.Entities;
 
-namespace Telegram.WebAPI.Domain.Interfaces
+namespace Telegram.WebAPI.Domain.Interfaces;
+
+public interface IUserRepository
 {
-    public interface IUserRepository
-    {
-        void UpdateUser(User user);
-        User AddUser(int chatId, out bool isNewUser, string name);
+    void UpdateUser(User user);
+    User AddUser(int chatId, out bool isNewUser, string name);
 
-        Task<List<User>> GetAllUsersAsync();
+    Task<List<User>> GetAllUsersAsync();
 
-        Task<List<User>> GetAllUsersWithSendRiverActivateAsync();
+    Task<List<User>> GetAllUsersWithSendRiverActivateAsync();
 
-        Task<User> GetUserByIdAsync(Guid id);
+    Task<User> GetUserByIdAsync(Guid id);
 
-        Task<User> GetUserByTelegramIdAsync(long id);
+    Task<User> GetUserByTelegramIdAsync(long id);
 
-        List<User> GetAllRemindersActive();
+    List<User> GetAllRemindersActive();
 
-        User GetAllRemindersActiveByUser(Guid userId);
-    }
+    User GetAllRemindersActiveByUser(Guid userId);
 }
