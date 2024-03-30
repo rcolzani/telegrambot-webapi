@@ -65,41 +65,35 @@ public class TelegramBotApplication
 
             string messageReceived = e.Message.Text.ToLower().RemoveAccents();
 
-            if (messageReceived == "ola" || messageReceived == "/start")
+            switch (messageReceived)
             {
-                ReceivedMessageHello(user, isNewUser);
-            }
-            else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTextMessage)
-            {
-                ReceivedMessageReminderText(user, userLastReminder, messageReceived);
-            }
-            else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTime)
-            {
-                ReceivedMessageReminderTime(user, userLastReminder, messageReceived);
-            }
-            else if (messageReceived == "iniciar")
-            {
-                ReceivedMessageStart(user);
-            }
-            else if (messageReceived == "lembrete")
-            {
-                ReceivedMessageReminder(user);
-            }
-            else if (messageReceived == "nivel do rio")
-            {
-                ReveivedMessageRiverLevel(user);
-            }
-            else if (messageReceived == "consultar")
-            {
-                await ReceivedMessageConsult(user);
-            }
-            else if (messageReceived == "parar")
-            {
-                ReceivedMessageStopReceiver(user);
-            }
-            else
-            {
-                ReceivedMessageCommandNotUnderstand(user);
+                case "ola":
+                case "/start":
+                    ReceivedMessageHello(user, isNewUser);
+                    break;
+                case "iniciar":
+                    ReceivedMessageStart(user);
+                    break;
+                case "lembrete":
+                    ReceivedMessageReminder(user);
+                    break;
+                case "nivel do rio":
+                    ReveivedMessageRiverLevel(user);
+                    break;
+                case "consultar":
+                    await ReceivedMessageConsult(user);
+                    break;
+                case "parar":
+                    ReceivedMessageStopReceiver(user);
+                    break;
+                default:
+                    if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTextMessage)                   
+                        ReceivedMessageReminderText(user, userLastReminder, messageReceived);                
+                    else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTime)
+                        ReceivedMessageReminderTime(user, userLastReminder, messageReceived);               
+                    else
+                        ReceivedMessageCommandNotUnderstand(user);             
+                    break;
             }
 
             //O envio de mensagens para o front e a gravação da mensagem recebida devem ser feitas após o processamento da mensagem e envio de resposta ao cliente
@@ -250,22 +244,38 @@ public class TelegramBotApplication
     {
         try
         {
-            var keyboard = new ReplyKeyboardMarkup(
-                 new[]
-             {
-                        new[]
-                        {
-                            new KeyboardButton("Lembrete")
-                        },
-                        new []{
-                            new KeyboardButton("Nível do rio")
-                        },
-                        new[]
-                        {
-                            new KeyboardButton("Parar")
-                        }
-                }
-            );
+            //var keyboard = new ReplyKeyboardMarkup(
+            //     new[]
+            // {
+            //            new[]
+            //            {
+            //                new KeyboardButton("Lembrete")
+            //            },
+            //            new []{
+            //                new KeyboardButton("Nível do rio")
+            //            },
+            //            new[]
+            //            {
+            //                new KeyboardButton("Parar")
+            //            }
+            //    }
+            //);
+
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                // first row
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "1.1", callbackData: "11"),
+                    InlineKeyboardButton.WithCallbackData(text: "1.2", callbackData: "12"),
+                },
+                // second row
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "2.1", callbackData: "21"),
+                    InlineKeyboardButton.WithCallbackData(text: "2.2", callbackData: "22"),
+                },
+            });
 
             string texto = $"Olá {user.Name}, {Environment.NewLine}{Environment.NewLine}";
 
