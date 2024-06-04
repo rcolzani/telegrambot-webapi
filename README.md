@@ -56,7 +56,7 @@ Comece enviando '/start' ou 'Olá' e o bot responderá com os comandos disponív
 1. Crie um token e execute a aplicação, conforme descrito em [Como executar o projeto](#-como-executar-o-projeto)
 2. Envie 'Olá' para o bot criado
 3. O bot responderá com algumas instruções e mudará o teclado do celular para as opções disponíveis
-4. Selecione a opção desejada
+4. Selecione a opção desejada.
 
 ---
 
