@@ -1,29 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.Shared", "Telegram.WebAPI.Shared\Telegram.Shared.csproj", "{3B071C4E-20A3-49B9-B42F-7DEF1A43FF98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Telegram.WebAPI.Shared\Shared.csproj", "{3B071C4E-20A3-49B9-B42F-7DEF1A43FF98}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.Domain", "Telegram.WebAPI.Domain\Telegram.Domain.csproj", "{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Module.MessageReceiver.Domain", "Modules\MessageReceiver\Domain\Module.MessageReceiver.Domain.csproj", "{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.Application", "Telegram.WebAPI.Application\Telegram.Application.csproj", "{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Module.MessageReceiver.Application", "Modules\MessageReceiver\Application\Module.MessageReceiver.Application.csproj", "{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.WebAPI", "Telegram.WebAPI\Telegram.WebAPI.csproj", "{9452686B-5CD4-4E26-9C71-15C65D83D60A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "Telegram.WebAPI\API.csproj", "{9452686B-5CD4-4E26-9C71-15C65D83D60A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3BF43169-078D-4BCD-B6B0-62F72AE63737} = {3BF43169-078D-4BCD-B6B0-62F72AE63737}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.Data", "Telegram.WebAPI.Data\Telegram.Data.csproj", "{3BF43169-078D-4BCD-B6B0-62F72AE63737}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Module.MessageReceiver.Infrastructure", "Modules\MessageReceiver\Infrastructure\Module.MessageReceiver.Infrastructure.csproj", "{3BF43169-078D-4BCD-B6B0-62F72AE63737}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegram.IoC", "Telegram.WebAPI.IoC\Telegram.IoC.csproj", "{0C676C27-2505-44C0-9BC2-216D7EE9E9C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC", "Telegram.WebAPI.IoC\IoC.csproj", "{0C676C27-2505-44C0-9BC2-216D7EE9E9C8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3BF43169-078D-4BCD-B6B0-62F72AE63737} = {3BF43169-078D-4BCD-B6B0-62F72AE63737}
 		{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34} = {18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34}
 		{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B} = {3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegram.Shared.UnitTests", "Telegram.Shared.UnitTests\Telegram.Shared.UnitTests.csproj", "{B3799510-3899-4CF7-B51D-D42F7242FAF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.UnitTests", "Telegram.Shared.UnitTests\Shared.UnitTests.csproj", "{B3799510-3899-4CF7-B51D-D42F7242FAF6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{18447357-C6DA-4D33-A98A-C1AA8C3ED228}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MessageReceiver", "MessageReceiver", "{EBE157B9-AA46-4EF8-BB2F-5FD752C2CDFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +66,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{18C8B86C-7802-4CB0-ACFE-FBE5ED12BF34} = {EBE157B9-AA46-4EF8-BB2F-5FD752C2CDFB}
+		{3CE9FF88-A978-4E14-BE3B-F7FCA9139B7B} = {EBE157B9-AA46-4EF8-BB2F-5FD752C2CDFB}
+		{3BF43169-078D-4BCD-B6B0-62F72AE63737} = {EBE157B9-AA46-4EF8-BB2F-5FD752C2CDFB}
+		{EBE157B9-AA46-4EF8-BB2F-5FD752C2CDFB} = {18447357-C6DA-4D33-A98A-C1AA8C3ED228}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4EC81F1-AF00-4390-8A98-E51721E19A80}

@@ -87,12 +87,12 @@ public class TelegramBotApplication
                     ReceivedMessageStopReceiver(user);
                     break;
                 default:
-                    if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTextMessage)                   
-                        ReceivedMessageReminderText(user, userLastReminder, messageReceived);                
+                    if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTextMessage)
+                        ReceivedMessageReminderText(user, userLastReminder, messageReceived);
                     else if (userLastReminder != null && userLastReminder.Status == Domain.Enums.ReminderStatus.WaitingForTime)
-                        ReceivedMessageReminderTime(user, userLastReminder, messageReceived);               
+                        ReceivedMessageReminderTime(user, userLastReminder, messageReceived);
                     else
-                        ReceivedMessageCommandNotUnderstand(user);             
+                        ReceivedMessageCommandNotUnderstand(user);
                     break;
             }
 
@@ -244,38 +244,21 @@ public class TelegramBotApplication
     {
         try
         {
-            //var keyboard = new ReplyKeyboardMarkup(
-            //     new[]
-            // {
-            //            new[]
-            //            {
-            //                new KeyboardButton("Lembrete")
-            //            },
-            //            new []{
-            //                new KeyboardButton("Nível do rio")
-            //            },
-            //            new[]
-            //            {
-            //                new KeyboardButton("Parar")
-            //            }
-            //    }
-            //);
 
-            InlineKeyboardMarkup keyboard = new(new[]
-            {
-                // first row
-                new []
+            var keyboard = new ReplyKeyboardMarkup(
+                new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "1.1", callbackData: "11"),
-                    InlineKeyboardButton.WithCallbackData(text: "1.2", callbackData: "12"),
-                },
-                // second row
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "2.1", callbackData: "21"),
-                    InlineKeyboardButton.WithCallbackData(text: "2.2", callbackData: "22"),
-                },
-            });
+                    new[]
+                    {
+                        new KeyboardButton("Lembrete"),
+                        new KeyboardButton("Nível do rio")
+                    },
+                    new[]
+                    {
+                        new KeyboardButton("Parar")
+                    }
+                }
+            );
 
             string texto = $"Olá {user.Name}, {Environment.NewLine}{Environment.NewLine}";
 

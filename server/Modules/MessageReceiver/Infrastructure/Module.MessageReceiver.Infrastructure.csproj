@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Telegram.WebAPI.Domain\Telegram.Domain.csproj" />
+    <ProjectReference Include="..\Domain\Module.MessageReceiver.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -30,7 +30,7 @@ public class TelegramBotService : IHostedService
     private TelegramBotClient bot;
 
     private Task _executingTask;
-    private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
+    private CancellationTokenSource _stoppingCts;
     private readonly IHubContext<ChatHub, IChatClient> _chatHub;
     private bool telegramBotRunning = false;
     private TelegramBotApplication _telegramBotApplication;
@@ -84,7 +84,7 @@ public class TelegramBotService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _executingTask = ExecuteAsync(_stoppingCts.Token);
+        _executingTask = ExecuteAsync(cancellationToken);
         if (_executingTask.IsCompleted)
         {
             return _executingTask;

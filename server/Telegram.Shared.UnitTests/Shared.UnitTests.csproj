@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Telegram.WebAPI.Shared\Telegram.Shared.csproj" />
+    <ProjectReference Include="..\Telegram.WebAPI.Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

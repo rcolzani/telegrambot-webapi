@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\MessageReceiver\Application\Module.MessageReceiver.Application.csproj" />
+    <ProjectReference Include="..\Modules\MessageReceiver\Infrastructure\Module.MessageReceiver.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\MessageReceiver\Domain\Module.MessageReceiver.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
