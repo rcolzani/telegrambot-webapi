@@ -88,7 +88,7 @@ Comece enviando '/start' ou 'Olá' e o bot responderá com os comandos disponív
 
 ##### Backend
 
-- .NET Core 3.1
+- .NET 8
 - MySQL
 - Entity Framework
 - <a href="https://core.telegram.org/bots/api">Telegram Bot API</a>
@@ -99,7 +99,7 @@ Comece enviando '/start' ou 'Olá' e o bot responderá com os comandos disponív
 ##### Frontend
 
 - <a href="https://reactjs.org"> ReactJS </a>
-- <a href="https://styled-components.com/">Styled Components </a>
+- <a href="https://styled-components.com/">Styled Components</a>
 
 ##### Publicação
 
